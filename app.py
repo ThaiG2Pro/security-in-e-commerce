@@ -66,6 +66,13 @@ def init_db():
 # Khởi tạo database
 init_db()
 
+# Mock data cho clickjacking
+def get_mock_cart():
+    return [
+        (1, "Demo Shirt", 10.0, "images/shirt.jpg"),
+        (2, "Demo Jeans", 10.0, "images/jeans.jpg")
+    ]
+
 # Trang chủ (danh sách sản phẩm)
 @app.route('/')
 def index():
@@ -110,10 +117,13 @@ def logout():
 @app.route('/add_to_cart', methods=['POST'])
 def add_to_cart():
     add_security_headers()
-    if 'user' not in session:
+    clickjack = request.args.get('clickjack', 'false').lower() == 'true'
+    if not clickjack and 'user' not in session:
         return jsonify({'error': 'Please login to add items to cart'}), 401
     product_id = request.form['product_id']
-    email = session['user']
+    email = session.get('user', 'demo@example.com' if clickjack else None)
+    if clickjack:
+        return jsonify({'message': 'Mock item added to cart'})
     conn = get_db_connection()
     c = conn.cursor()
     try:
@@ -128,8 +138,13 @@ def add_to_cart():
 @app.route('/cart')
 def cart():
     add_security_headers()
-    if 'user' not in session:
+    clickjack = request.args.get('clickjack', 'false').lower() == 'true'
+    if not clickjack and 'user' not in session:
         return redirect(url_for('login'))
+    if clickjack:
+        cart_items = get_mock_cart()
+        total = sum([float(p[2]) for p in cart_items])
+        return render_template('cart.html', cart_items=cart_items, total=total, user="Demo User")
     email = session['user']
     cart_items = []
     total = 0
@@ -146,29 +161,36 @@ def cart():
 @app.route('/delivery', methods=['GET', 'POST'])
 def delivery():
     add_security_headers()
-    if 'user' not in session:
+    clickjack = request.args.get('clickjack', 'false').lower() == 'true'
+    if not clickjack and 'user' not in session:
         return redirect(url_for('login'))
     if request.method == 'POST':
         address = request.form['address']
         session['delivery_address'] = address
         return redirect(url_for('checkout'))
     prefilled_address = unquote(request.args.get('address', ''))
-    return render_template('delivery.html', prefilled_address=prefilled_address, user=session.get('user'))
+    return render_template('delivery.html', prefilled_address=prefilled_address, user=session.get('user') or "Demo User")
 
 # Trang thanh toán
 @app.route('/checkout', methods=['GET', 'POST'])
 def checkout():
     add_security_headers()
-    if 'user' not in session:
+    clickjack = request.args.get('clickjack', 'false').lower() == 'true'
+    if not clickjack and 'user' not in session:
         return redirect(url_for('login'))
-    email = session['user']
-    cart_items = cart_items_helper(email)
-    total = sum([float(p[2]) for p in cart_items])
-    conn = get_db_connection()
-    c = conn.cursor()
-    c.execute('SELECT balance FROM users WHERE email = %s', (email,))
-    balance = c.fetchone()[0]
-    if request.method == 'POST':
+    email = session.get('user', 'demo@example.com' if clickjack else None)
+    if clickjack:
+        cart_items = get_mock_cart()
+        total = sum([float(p[2]) for p in cart_items])
+        balance = 10000000
+    else:
+        cart_items = cart_items_helper(email)
+        total = sum([float(p[2]) for p in cart_items])
+        conn = get_db_connection()
+        c = conn.cursor()
+        c.execute('SELECT balance FROM users WHERE email = %s', (email,))
+        balance = c.fetchone()[0]
+    if request.method == 'POST' and not clickjack:
         if not cart_items:
             conn.close()
             return jsonify({'error': 'Cart is empty'}), 400
@@ -186,7 +208,8 @@ def checkout():
         conn.close()
         session.pop('delivery_address', None)
         return jsonify({'message': 'Purchase successful', 'order_id': order_id})
-    conn.close()
+    if not clickjack:
+        conn.close()
     inject_script = os.getenv('INJECT_SCRIPT', 'false').lower() == 'true'
     script_content = os.getenv('SCRIPT_CONTENT', '') if inject_script else ''
     return render_template('checkout.html', cart_items=cart_items, total=total, user=email,
@@ -296,4 +319,4 @@ def cart_items_helper(email):
     return cart_items
 
 if __name__ == '__main__':
-    app.run(debug=False)
+    app.run(debug=True)
