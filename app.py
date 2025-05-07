@@ -8,6 +8,11 @@ from urllib.parse import urlparse, unquote
 app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY', 'your-secret-key')
 
+# Cấu hình session cookie
+app.config['SESSION_COOKIE_SAMESITE'] = 'None'
+app.config['SESSION_COOKIE_SECURE'] = True
+app.config['SESSION_COOKIE_HTTPONLY'] = True
+
 # Middleware cho Security Headers
 def add_security_headers():
     if os.getenv('SECURITY_HEADERS', 'false').lower() == 'true':
@@ -153,6 +158,7 @@ def delivery():
 # Trang thanh toán
 @app.route('/checkout', methods=['GET', 'POST'])
 def checkout():
+    add_security_headers()
     if 'user' not in session:
         return redirect(url_for('login'))
     email = session['user']
