@@ -11,14 +11,8 @@
       <div class="container mx-auto flex justify-between items-center">
         <a href="/" class="text-xl font-bold">E-Commerce</a>
         <div>
-          {% if user %}
           <span class="mr-4">Hello, {{ user }}</span>
           <a href="/logout" class="text-blue-500 hover:underline">Logout</a>
-          {% else %}
-          <a href="/login" class="mr-4 text-blue-500 hover:underline">Login</a>
-          <a href="/register" class="text-blue-500 hover:underline">Register</a>
-          {% endif %}
-          <a href="/cart" class="ml-4 text-blue-500 hover:underline">Cart</a>
         </div>
       </div>
     </nav>
@@ -35,17 +29,20 @@
           />
           <div>
             <p class="text-lg font-semibold">{{ item[1] }}</p>
-            <p class="text-gray-600">${{ item[2] }}</p>
+            <p class="text-gray-600">VND {{ item[2] }}</p>
           </div>
         </div>
         {% endfor %}
       </div>
-      <p class="text-xl font-bold mt-4">Total: ${{ total }}</p>
-      <a
-        href="/checkout"
-        class="mt-4 inline-block bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-        >Proceed to Checkout</a
-      >
+      <p class="text-xl font-bold mt-4">Total: VND {{ total }}</p>
+      <form action="/delivery" method="GET">
+        <button
+          type="submit"
+          class="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+        >
+          Proceed to Checkout
+        </button>
+      </form>
       {% else %}
       <p class="text-center text-gray-600">Your cart is empty.</p>
       {% endif %}

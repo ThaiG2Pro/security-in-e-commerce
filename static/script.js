@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
   // Xử lý thêm vào giỏ hàng
-  document.querySelectorAll('form[action="/add_to_cart"]').forEach((form) => {
+  document.querySelectorAll('form[id^="add-to-cart-"]').forEach((form) => {
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
       const formData = new FormData(form);
@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
         body: formData,
       });
       const result = await response.json();
-      alert(result.message);
+      alert(result.message || result.error);
     });
   });
 
@@ -99,6 +99,25 @@ document.addEventListener("DOMContentLoaded", () => {
       } else {
         messageEl.textContent = result.error;
         messageEl.classList.add("text-red-600");
+      }
+    });
+  }
+
+  // Xử lý form địa chỉ
+  const deliveryForm = document.querySelector("#delivery-form");
+  if (deliveryForm) {
+    deliveryForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const formData = new FormData(deliveryForm);
+      const response = await fetch("/delivery", {
+        method: "POST",
+        body: formData,
+      });
+      if (response.ok) {
+        window.location.href = "/checkout";
+      } else {
+        const result = await response.json();
+        alert(result.error);
       }
     });
   }

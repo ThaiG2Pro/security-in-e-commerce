@@ -1,0 +1,54 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+venv/
+.env/
+.venv/
+
+# VSCode settings
+.vscode/
+
+# macOS
+.DS_Store
+
+# Logs and temp
+*.log
+*.sqlite3
+*.db
+*.bak
+*.tmp
+
+# Environment variables
+.env
+
+# Python egg files
+*.egg-info/
+*.egg/
+
+# Deployment & testing
+instance/
+coverage/
+htmlcov/
+*.cover
+*.pytest_cache/
+
+# Ignore render build outputs
+build/
+dist/
+
+# Ignore node stuff if accidentally included
+node_modules/
+
+# Ignore local images or uploads
+static/uploads/
+media/
+
+# Ignore secrets or local settings
+secrets.json
+config.json
+
+image_of_internet
+resize.py 
