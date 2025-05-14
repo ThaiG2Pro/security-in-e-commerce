@@ -1,82 +1,72 @@
-<!-- User Account Dashboard -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>My Account - E-Commerce</title>
-    <link rel="stylesheet" href="/static/style.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-</head>
-<body>
-    {% include 'navbar.html' %}
-    <div class="container mt-5 mb-5">
-        <h2 class="mb-4">My Account</h2>
-        <div class="row">
-            <div class="col-md-4">
-                <div class="card mb-4">
-                    <div class="card-body text-center">
-                        <img src="/static/images/user_avatar.png" alt="Avatar" class="rounded-circle mb-3" width="80" height="80">
-                        <h5 class="card-title">{{ user.first_name }} {{ user.last_name }}</h5>
-                        <p class="card-text text-muted">{{ user.email }}</p>
-                    </div>
-                </div>
-                <div class="list-group">
-                    <a href="/orders" class="list-group-item list-group-item-action">Order History</a>
-                    <a href="/account/addresses" class="list-group-item list-group-item-action">Manage Addresses</a>
-                    <a href="/account/payment-methods" class="list-group-item list-group-item-action">Payment Methods</a>
-                    <a href="/logout" class="list-group-item list-group-item-action text-danger">Logout</a>
+{% extends 'base.html' %}
+{% block title %}My Account - E-Commerce{% endblock %}
+{% block content %}
+<div class="container mt-5 mb-5">
+    <h2 class="mb-4">My Account</h2>
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-body text-center">
+                    <img src="/static/images/user_avatar.png" alt="Avatar" class="rounded-circle mb-3" width="80" height="80">
+                    <h5 class="card-title">{{ user.first_name }} {{ user.last_name }}</h5>
+                    <p class="card-text text-muted">{{ user.email }}</p>
                 </div>
             </div>
-            <div class="col-md-8">
-                <div class="card mb-4">
-                    <div class="card-header bg-light">
-                        <strong>Account Overview</strong>
-                    </div>
-                    <div class="card-body">
-                        <p><strong>Name:</strong> {{ user.first_name }} {{ user.last_name }}</p>
-                        <p><strong>Email:</strong> {{ user.email }}</p>
-                        <p><strong>Phone:</strong> {{ user.phone or 'Not set' }}</p>
-                        <p><strong>Member Since:</strong> {{ user.created_at.strftime('%B %d, %Y') if user.created_at else '' }}</p>
-                        <p><strong>Balance:</strong> ${{ '%.2f' % user.balance if user.balance is not none else '0.00' }}</p>
+            <div class="list-group">
+                <a href="/orders" class="list-group-item list-group-item-action">Order History</a>
+                <a href="/account/addresses" class="list-group-item list-group-item-action">Manage Addresses</a>
+                <a href="/account/payment-methods" class="list-group-item list-group-item-action">Payment Methods</a>
+                <a href="/logout" class="list-group-item list-group-item-action text-danger">Logout</a>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header bg-light">
+                    <strong>Account Overview</strong>
+                </div>
+                <div class="card-body">
+                    <p><strong>Name:</strong> {{ user.first_name }} {{ user.last_name }}</p>
+                    <p><strong>Email:</strong> {{ user.email }}</p>
+                    <p><strong>Phone:</strong> {{ user.phone or 'Not set' }}</p>
+                    <p><strong>Member Since:</strong> {{ user.created_at.strftime('%B %d, %Y') if user.created_at else '' }}</p>
+                    <p><strong>Balance:</strong> ${{ '%.2f' % user.balance if user.balance is not none else '0.00' }}</p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body text-center">
+                            <h6>Recent Orders</h6>
+                            <a href="/orders" class="btn btn-outline-primary btn-sm mt-2">View Orders</a>
+                        </div>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <div class="card h-100">
-                            <div class="card-body text-center">
-                                <h6>Recent Orders</h6>
-                                <a href="/orders" class="btn btn-outline-primary btn-sm mt-2">View Orders</a>
-                            </div>
+                <div class="col-md-6 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body text-center">
+                            <h6>Saved Addresses</h6>
+                            <a href="/account/addresses" class="btn btn-outline-primary btn-sm mt-2">Manage Addresses</a>
                         </div>
                     </div>
-                    <div class="col-md-6 mb-3">
-                        <div class="card h-100">
-                            <div class="card-body text-center">
-                                <h6>Saved Addresses</h6>
-                                <a href="/account/addresses" class="btn btn-outline-primary btn-sm mt-2">Manage Addresses</a>
-                            </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body text-center">
+                            <h6>Payment Methods</h6>
+                            <a href="/account/payment-methods" class="btn btn-outline-primary btn-sm mt-2">Manage Payments</a>
                         </div>
                     </div>
-                    <div class="col-md-6 mb-3">
-                        <div class="card h-100">
-                            <div class="card-body text-center">
-                                <h6>Payment Methods</h6>
-                                <a href="/account/payment-methods" class="btn btn-outline-primary btn-sm mt-2">Manage Payments</a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <div class="card h-100">
-                            <div class="card-body text-center">
-                                <h6>Wishlist</h6>
-                                <a href="/wishlist" class="btn btn-outline-primary btn-sm mt-2">View Wishlist</a>
-                            </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body text-center">
+                            <h6>Wishlist</h6>
+                            <a href="/wishlist" class="btn btn-outline-primary btn-sm mt-2">View Wishlist</a>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    {% include 'footer.html' %}
-</body>
-</html>
+</div>
+{% endblock %}

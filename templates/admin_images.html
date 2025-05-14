@@ -1,9 +1,18 @@
-{% extends 'admin_dashboard.html' %}
+{% extends 'base.html' %}
+{% block title %}Admin - Images{% endblock %}
 {% block content %}
-<h2>Image Gallery</h2>
-<ul>
-  {% for img in images %}
-    <li><img src="/static/images/{{ img }}" alt="{{ img }}" style="max-width:120px;max-height:120px;"> {{ img }}</li>
-  {% endfor %}
-</ul>
+<div class="container mx-auto p-4 max-w-2xl">
+  <h1 class="text-2xl font-bold mb-6 text-center">Image Gallery</h1>
+  <div class="mb-4 text-right">
+    <a href="/admin" class="text-blue-500 hover:underline">Back to Dashboard</a>
+  </div>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    {% for img in images %}
+      <div class="border p-2 rounded">
+        <img src="/static/images/{{ img }}" alt="{{ img }}" class="mx-auto mb-2" style="max-width:120px;max-height:120px;">
+        <p class="text-center text-sm">{{ img }}</p>
+      </div>
+    {% endfor %}
+  </div>
+</div>
 {% endblock %}

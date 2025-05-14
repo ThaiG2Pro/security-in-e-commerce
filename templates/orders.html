@@ -1,31 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Order History</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
-  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.4.4/dist/umd/popper.min.js"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-</head>
-<body class="bg-gray-100">
-  <nav class="bg-white p-4 shadow mb-4">
-    <div class="container mx-auto flex justify-between items-center">
-      <a href="/" class="text-xl font-bold">E-Commerce</a>
-      <div>
-        {% if user %}
-        <span class="mr-4">Hello, {{ user }}</span>
-        <a href="/logout" class="text-blue-500 hover:underline">Logout</a>
-        {% else %}
-        <a href="/login" class="mr-4 text-blue-500 hover:underline">Login</a>
-        <a href="/register" class="text-blue-500 hover:underline">Register</a>
-        {% endif %}
-        <a href="/cart" class="ml-4 text-blue-500 hover:underline">Cart</a>
-      </div>
-    </div>
-  </nav>
+{% extends 'base.html' %}
+{% block title %}Order History{% endblock %}
+{% block content %}
   <div class="container bg-white rounded shadow p-4 mt-4">
     <h2 class="mb-4 font-bold text-2xl">Order History</h2>
     {% if orders and orders|length > 0 %}
@@ -55,5 +30,4 @@
     <p>You have no orders yet.</p>
     {% endif %}
   </div>
-</body>
-</html>
+{% endblock %}

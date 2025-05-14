@@ -1,0 +1,89 @@
+<!-- Base template for all pages -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}Vietnamese Coffee & Bakery{% endblock %}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+  {% block head %}{% endblock %}
+</head>
+<body class="bg-gray-100">
+  <!-- Navigation -->
+  <nav class="bg-white shadow">
+    <div class="container mx-auto px-4 py-3">
+      <div class="flex justify-between items-center">
+        <div class="flex items-center">
+          <a href="/" class="text-2xl font-bold text-brown-600">
+            <span class="text-amber-800">Coffee</span><span class="text-amber-600">Craft</span>
+          </a>
+        </div>
+        <div class="hidden md:flex space-x-8">
+          <a href="/" class="text-gray-700 hover:text-amber-600">Home</a>
+          <a href="/shop" class="text-gray-700 hover:text-amber-600">Shop</a>
+          <a href="/about" class="text-gray-700 hover:text-amber-600">About Us</a>
+          <a href="/faq" class="text-gray-700 hover:text-amber-600">FAQ</a>
+        </div>
+        <div class="flex items-center space-x-4">
+          {% if user %}
+          <span class="mr-2">Hello, {{ user }}</span>
+          {% if session['role'] == 'admin' %}
+          <a href="/admin" class="text-red-500 hover:text-red-700"><i class="fas fa-cog mr-1"></i>Admin</a>
+          {% endif %}
+          <a href="/logout" class="text-gray-700 hover:text-amber-600"><i class="fas fa-sign-out-alt mr-1"></i>Logout</a>
+          {% else %}
+          <a href="/login" class="text-gray-700 hover:text-amber-600"><i class="fas fa-user mr-1"></i>Login</a>
+          <a href="/register" class="text-gray-700 hover:text-amber-600"><i class="fas fa-user-plus mr-1"></i>Register</a>
+          {% endif %}
+          <a href="/wishlist" class="text-gray-700 hover:text-amber-600"><i class="fas fa-heart mr-1"></i></a>
+          <a href="/cart" class="text-gray-700 hover:text-amber-600"><i class="fas fa-shopping-cart mr-1"></i>Cart</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+  <footer class="bg-gray-800 text-white py-12 mt-8">
+    <div class="container mx-auto px-4">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div>
+          <h3 class="text-xl font-bold mb-4">Vietnamese Coffee & Bakery</h3>
+          <p class="text-gray-400">Bringing authentic Vietnamese flavors to your doorstep. Premium coffee and delicious bakery items made with care.</p>
+        </div>
+        <div>
+          <h3 class="text-lg font-bold mb-4">Quick Links</h3>
+          <ul class="space-y-2">
+            <li><a href="/" class="text-gray-400 hover:text-white">Home</a></li>
+            <li><a href="/shop" class="text-gray-400 hover:text-white">Shop</a></li>
+            <li><a href="/about" class="text-gray-400 hover:text-white">About Us</a></li>
+            <li><a href="/faq" class="text-gray-400 hover:text-white">FAQ</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-lg font-bold mb-4">Contact Us</h3>
+          <ul class="space-y-2 text-gray-400">
+            <li><i class="fas fa-map-marker-alt mr-2"></i> 123 Coffee Street, Ho Chi Minh City</li>
+            <li><i class="fas fa-phone mr-2"></i> (123) 456-7890</li>
+            <li><i class="fas fa-envelope mr-2"></i> info@vietnamesecoffee.com</li>
+          </ul>
+          <div class="mt-4 flex space-x-4">
+            <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-instagram"></i></a>
+            <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-twitter"></i></a>
+          </div>
+        </div>
+      </div>
+      <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
+        <p>&copy; 2025 Vietnamese Coffee & Bakery. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.4.4/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

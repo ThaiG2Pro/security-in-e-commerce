@@ -1,35 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>{{ product[1] }} - Product Detail</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
-  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.4.4/dist/umd/popper.min.js"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-</head>
-<body class="bg-gray-100">
-  <nav class="bg-white p-4 shadow mb-4">
-    <div class="container mx-auto flex justify-between items-center">
-      <a href="/" class="text-xl font-bold">E-Commerce</a>
-      <div>
-        {% if user %}
-        <span class="mr-4">Hello, {{ user }}</span>
-        <a href="/logout" class="text-blue-500 hover:underline">Logout</a>
-        {% else %}
-        <a href="/login" class="mr-4 text-blue-500 hover:underline">Login</a>
-        <a href="/register" class="text-blue-500 hover:underline">Register</a>
-        {% endif %}
-        <a href="/cart" class="ml-4 text-blue-500 hover:underline">Cart</a>
-      </div>
-    </div>
-  </nav>
+{% extends 'base.html' %}
+{% block title %}{{ product[1] }} - Product Detail{% endblock %}
+{% block content %}
   <div class="container bg-white rounded shadow p-4 mt-4">
     <div class="row">
       <div class="col-md-6">
-        <img src="/static/{{ product[7] }}" class="img-fluid rounded mb-3" alt="{{ product[1] }}" />
+        <img src="/static/images/{{ product[7] }}" class="img-fluid rounded mb-3" alt="{{ product[1] }}" />
       </div>
       <div class="col-md-6">
         <h2 class="font-bold text-2xl mb-2">{{ product[1] }}</h2>
@@ -99,6 +74,8 @@
       </div>
     </div>
   </div>
+{% endblock %}
+{% block scripts %}
   <script>
     document.getElementById('addToCartForm').onsubmit = function(e) {
       e.preventDefault();
@@ -133,5 +110,4 @@
       });
     };
   </script>
-</body>
-</html>
+{% endblock %}

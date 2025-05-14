@@ -1,38 +1,33 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Reset Password</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-  </head>
-  <body class="bg-gray-100">
-    <div class="container mx-auto p-4 max-w-md">
-      <h1 class="text-2xl font-bold mb-4 text-center">Reset Password</h1>
-      <form id="reset-confirm-form" action="/reset/{{ token }}" method="POST">
-        <div class="mb-4">
-          <label for="password" class="block text-gray-700">New Password</label>
-          <input
-            type="password"
-            name="password"
-            class="w-full p-2 border rounded"
-            required
-          />
-        </div>
-        <button
-          type="submit"
-          class="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600"
-        >
-          Reset Password
-        </button>
-      </form>
-      <p id="message" class="mt-4 text-center"></p>
-      <a
-        href="/login"
-        class="block mt-4 text-blue-500 hover:underline text-center"
-        >Back to Login</a
+{% extends 'base.html' %}
+{% block title %}Reset Password{% endblock %}
+{% block content %}
+  <div class="container mx-auto p-4 max-w-md">
+    <h1 class="text-2xl font-bold mb-4 text-center">Reset Password</h1>
+    <form id="reset-confirm-form" action="/reset/{{ token }}" method="POST">
+      <div class="mb-4">
+        <label for="password" class="block text-gray-700">New Password</label>
+        <input
+          type="password"
+          name="password"
+          class="w-full p-2 border rounded"
+          required
+        />
+      </div>
+      <button
+        type="submit"
+        class="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600"
       >
-    </div>
-    <script src="/static/script.js"></script>
-  </body>
-</html>
+        Reset Password
+      </button>
+    </form>
+    <p id="message" class="mt-4 text-center"></p>
+    <a
+      href="/login"
+      class="block mt-4 text-blue-500 hover:underline text-center"
+      >Back to Login</a
+    >
+  </div>
+{% endblock %}
+{% block scripts %}
+<script src="/static/script.js"></script>
+{% endblock %}

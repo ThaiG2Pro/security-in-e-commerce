@@ -1,4 +1,5 @@
-{% extends 'index.html' %}
+{% extends 'base.html' %}
+{% block title %}Shop{% endblock %}
 {% block content %}
 <section class="py-12 bg-white">
   <div class="container mx-auto px-4">
@@ -6,7 +7,7 @@
     <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
       {% for product in products %}
       <div class="bg-white rounded-lg shadow overflow-hidden">
-        <img src="/static/{{ product[7] }}" alt="{{ product[1] }}" class="w-full h-48 object-cover">
+        <img src="/static/images/{{ product[7] }}" alt="{{ product[1] }}" class="w-full h-48 object-cover">
         <div class="p-4">
           <h3 class="font-bold mb-2">{{ product[1] }}</h3>
           <p class="text-gray-600 text-sm mb-3">{{ product[2] }}</p>
