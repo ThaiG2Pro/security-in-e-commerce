@@ -322,3 +322,22 @@ def product_detail(product_id):
     reviews = c.fetchall()
     conn.close()
     return render_template('product_detail.html', product=product, variants=variants, reviews=reviews, user=session.get('user'))
+
+@user_bp.route('/shop')
+def shop():
+    conn = get_db_connection()
+    c = conn.cursor()
+    c.execute('SELECT * FROM products ORDER BY id DESC')
+    products = c.fetchall()
+    c.execute('SELECT * FROM product_categories ORDER BY name')
+    categories = c.fetchall()
+    conn.close()
+    return render_template('shop.html', products=products, categories=categories, user=session.get('user'))
+
+@user_bp.route('/about')
+def about():
+    return render_template('about.html', user=session.get('user'))
+
+@user_bp.route('/faq')
+def faq():
+    return render_template('faq.html', user=session.get('user'))

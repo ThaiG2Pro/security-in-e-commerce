@@ -1,0 +1,28 @@
+{% extends 'index.html' %}
+{% block content %}
+<section class="py-12 bg-white">
+  <div class="container mx-auto px-4">
+    <h2 class="text-3xl font-bold text-center mb-12">Shop All Products</h2>
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+      {% for product in products %}
+      <div class="bg-white rounded-lg shadow overflow-hidden">
+        <img src="/static/{{ product[7] }}" alt="{{ product[1] }}" class="w-full h-48 object-cover">
+        <div class="p-4">
+          <h3 class="font-bold mb-2">{{ product[1] }}</h3>
+          <p class="text-gray-600 text-sm mb-3">{{ product[2] }}</p>
+          <div class="flex justify-between items-center">
+            {% if product[4] and product[4] < product[3] %}
+            <span class="text-red-600 font-bold">${{ product[4]|round(2) }}</span>
+            <span class="text-gray-400 line-through">${{ product[3]|round(2) }}</span>
+            {% else %}
+            <span class="text-gray-800 font-bold">${{ product[3]|round(2) }}</span>
+            {% endif %}
+            <a href="/product/{{ product[0] }}" class="text-amber-600 hover:text-amber-800">View <i class="fas fa-arrow-right ml-1"></i></a>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}
