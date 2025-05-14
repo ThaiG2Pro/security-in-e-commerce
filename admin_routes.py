@@ -40,7 +40,7 @@ def admin_add_product():
         return redirect(url_for('admin.admin_products'))
 
     conn.close()
-    return render_template('admin_add_product.html', categories=categories, user=session.get('user'))
+    return render_template('admin_add_product.html', user=session.get('user'))
 
 @admin_bp.route('/delete-product/<int:product_id>', methods=['POST'])
 @admin_required
@@ -56,16 +56,6 @@ def delete_product(product_id):
     finally:
         conn.close()
     return redirect(url_for('admin.admin_products'))
-
-@admin_bp.route('/categories')
-@admin_required
-def admin_categories():
-    conn = get_db_connection()
-    c = conn.cursor()
-    c.execute('SELECT * FROM product_categories ORDER BY id DESC')
-    categories = c.fetchall()
-    conn.close()
-    return render_template('admin_categories.html', categories=categories, user=session.get('user'))
 
 @admin_bp.route('/add-category', methods=['GET', 'POST'])
 @admin_required

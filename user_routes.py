@@ -14,7 +14,6 @@ def index():
     c = conn.cursor()
     c.execute('SELECT * FROM products ORDER BY id DESC')
     products = c.fetchall()
-
     conn.close()
     return render_template('index.html', products=products, user=session.get('user'))
 
@@ -330,7 +329,6 @@ def shop():
     c = conn.cursor()
     c.execute('SELECT * FROM products ORDER BY id DESC')
     products = c.fetchall()
-
     conn.close()
     return render_template('shop.html', products=products, user=session.get('user'))
 

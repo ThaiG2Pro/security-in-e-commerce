@@ -80,8 +80,8 @@
           <strong>Subtotal:</strong> ${{ order[3]|round(2) }}<br />
           <strong>Shipping Fee:</strong> ${{ order[8]|round(2) }}<br />
           <strong>Tax:</strong> ${{ order[9]|round(2) }}<br />
-          <strong>Discount:</strong> -${{ order[10]|round(2) }}<br />
-          <strong>Total:</strong> <span class="text-success">${{ (order[3] + order[8] + order[9] - order[10])|round(2) }}</span>
+          <strong>Discount:</strong> -${{ order[10]|default(0)|round(2) }}<br />
+          <strong>Total:</strong> <span class="text-success">${{ (order[3] + order[8] + order[9] - order[10]|default(0))|round(2) }}</span>
         </p>
         <p><strong>Payment Method ID:</strong> {{ order[6] or 'N/A' }}</p>
       </div>
