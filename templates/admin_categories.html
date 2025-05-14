@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block title %}Admin - Categories{% endblock %}
+{% block content %}
+<div class="container mx-auto p-4 max-w-4xl">
+  <h1 class="text-2xl font-bold mb-6 text-center">Category Management</h1>
+  <div class="mb-4 text-right">
+    <a href="{{ url_for('admin.admin_add_category') }}" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Add Category</a>
+    <a href="{{ url_for('admin.admin_dashboard') }}" class="ml-4 text-blue-500 hover:underline">Back to Dashboard</a>
+  </div>
+  <table class="min-w-full bg-white rounded shadow">
+    <thead>
+      <tr>
+        <th class="py-2 px-4 border-b">ID</th>
+        <th class="py-2 px-4 border-b">Name</th>
+        <th class="py-2 px-4 border-b">Description</th>
+        <th class="py-2 px-4 border-b">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for category in categories %}
+      <tr>
+        <td class="py-2 px-4 border-b">{{ category.id }}</td>
+        <td class="py-2 px-4 border-b">{{ category.name }}</td>
+        <td class="py-2 px-4 border-b">{{ category.description }}</td>
+        <td class="py-2 px-4 border-b">
+          <a href="{{ url_for('admin.admin_edit_category', category_id=category.id) }}" class="text-blue-500 hover:underline mr-2">Edit</a>
+          <form action="{{ url_for('admin.delete_category', category_id=category.id) }}" method="POST" style="display:inline;">
+            <button type="submit" class="text-red-500 hover:underline" onclick="return confirm('Delete this category?')">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

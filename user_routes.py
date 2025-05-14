@@ -74,7 +74,7 @@ def logout():
     add_security_headers()
     session.pop('user', None)
     session.pop('role', None)
-    return redirect(url_for('index'))
+    return redirect(url_for('user.index'))
 
 @user_bp.route('/reset-password', methods=['GET', 'POST'])
 def reset_password():
@@ -142,7 +142,7 @@ def verify():
 def cart():
     add_security_headers()
     if 'user' not in session:
-        return redirect(url_for('login'))
+        return redirect(url_for('user.login'))
     email = session['user']
     conn = get_db_connection()
     c = conn.cursor()
@@ -178,11 +178,25 @@ def add_to_cart():
     conn.close()
     return jsonify({'message': 'Added to cart'})
 
+@user_bp.route('/delivery')
+def delivery():
+    add_security_headers()
+    if 'user' not in session:
+        return redirect(url_for('user.login'))
+    email = session['user']
+    conn = get_db_connection()
+    c = conn.cursor()
+    # Fetch addresses for the user
+    c.execute("SELECT * FROM user_addresses WHERE user_email = %s", (email,))
+    addresses = c.fetchall()
+    conn.close()
+    return render_template('delivery.html', user=session.get('user'), addresses=addresses)
+
 @user_bp.route('/checkout', methods=['GET', 'POST'])
 def checkout():
     add_security_headers()
     if 'user' not in session:
-        return redirect(url_for('login'))
+        return redirect(url_for('user.login'))
     email = session['user']
     conn = get_db_connection()
     c = conn.cursor()
@@ -226,7 +240,7 @@ def checkout():
 @user_bp.route('/wishlist', methods=['GET'])
 def wishlist():
     if 'user' not in session:
-        return redirect(url_for('login'))
+        return redirect(url_for('user.login'))
     user_email = session['user']
     conn = get_db_connection()
     c = conn.cursor()
@@ -250,7 +264,7 @@ def order_history():
 @user_bp.route('/order/<order_id>')
 def order_detail(order_id):
     if 'user' not in session:
-        return redirect(url_for('login'))
+        return redirect(url_for('user.login'))
     user_email = session['user']
     conn = get_db_connection()
     c = conn.cursor()
@@ -264,7 +278,7 @@ def order_detail(order_id):
 @user_bp.route('/account/addresses', methods=['GET', 'POST'])
 def manage_addresses():
     if 'user' not in session:
-        return redirect(url_for('login'))
+        return redirect(url_for('user.login'))
     user_email = session['user']
     conn = get_db_connection()
     c = conn.cursor()
@@ -290,7 +304,7 @@ def manage_addresses():
 @user_bp.route('/account/payment-methods', methods=['GET', 'POST'])
 def manage_payment_methods():
     if 'user' not in session:
-        return redirect(url_for('login'))
+        return redirect(url_for('user.login'))
     user_email = session['user']
     conn = get_db_connection()
     c = conn.cursor()

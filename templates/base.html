@@ -16,29 +16,29 @@
     <div class="container mx-auto px-4 py-3">
       <div class="flex justify-between items-center">
         <div class="flex items-center">
-          <a href="/" class="text-2xl font-bold text-brown-600">
+          <a href="{{ url_for('user.index') }}" class="text-2xl font-bold text-brown-600">
             <span class="text-amber-800">Coffee</span><span class="text-amber-600">Craft</span>
           </a>
         </div>
         <div class="hidden md:flex space-x-8">
-          <a href="/" class="text-gray-700 hover:text-amber-600">Home</a>
-          <a href="/shop" class="text-gray-700 hover:text-amber-600">Shop</a>
-          <a href="/about" class="text-gray-700 hover:text-amber-600">About Us</a>
-          <a href="/faq" class="text-gray-700 hover:text-amber-600">FAQ</a>
+          <a href="{{ url_for('user.index') }}" class="text-gray-700 hover:text-amber-600">Home</a>
+          <a href="{{ url_for('user.shop') }}" class="text-gray-700 hover:text-amber-600">Shop</a>
+          <a href="{{ url_for('user.about') }}" class="text-gray-700 hover:text-amber-600">About Us</a>
+          <a href="{{ url_for('user.faq') }}" class="text-gray-700 hover:text-amber-600">FAQ</a>
         </div>
         <div class="flex items-center space-x-4">
           {% if user %}
           <span class="mr-2">Hello, {{ user }}</span>
           {% if session['role'] == 'admin' %}
-          <a href="/admin" class="text-red-500 hover:text-red-700"><i class="fas fa-cog mr-1"></i>Admin</a>
+          <a href="{{ url_for('admin.admin_dashboard') }}" class="text-red-500 hover:text-red-700"><i class="fas fa-cog mr-1"></i>Admin</a>
           {% endif %}
-          <a href="/logout" class="text-gray-700 hover:text-amber-600"><i class="fas fa-sign-out-alt mr-1"></i>Logout</a>
+          <a href="{{ url_for('user.logout') }}" class="text-gray-700 hover:text-amber-600"><i class="fas fa-sign-out-alt mr-1"></i>Logout</a>
           {% else %}
-          <a href="/login" class="text-gray-700 hover:text-amber-600"><i class="fas fa-user mr-1"></i>Login</a>
-          <a href="/register" class="text-gray-700 hover:text-amber-600"><i class="fas fa-user-plus mr-1"></i>Register</a>
+          <a href="{{ url_for('user.login') }}" class="text-gray-700 hover:text-amber-600"><i class="fas fa-user mr-1"></i>Login</a>
+          <a href="{{ url_for('user.register') }}" class="text-gray-700 hover:text-amber-600"><i class="fas fa-user-plus mr-1"></i>Register</a>
           {% endif %}
-          <a href="/wishlist" class="text-gray-700 hover:text-amber-600"><i class="fas fa-heart mr-1"></i></a>
-          <a href="/cart" class="text-gray-700 hover:text-amber-600"><i class="fas fa-shopping-cart mr-1"></i>Cart</a>
+          <a href="{{ url_for('user.wishlist') }}" class="text-gray-700 hover:text-amber-600"><i class="fas fa-heart mr-1"></i></a>
+          <a href="{{ url_for('user.cart') }}" class="text-gray-700 hover:text-amber-600"><i class="fas fa-shopping-cart mr-1"></i>Cart</a>
         </div>
       </div>
     </div>
@@ -56,10 +56,10 @@
         <div>
           <h3 class="text-lg font-bold mb-4">Quick Links</h3>
           <ul class="space-y-2">
-            <li><a href="/" class="text-gray-400 hover:text-white">Home</a></li>
-            <li><a href="/shop" class="text-gray-400 hover:text-white">Shop</a></li>
-            <li><a href="/about" class="text-gray-400 hover:text-white">About Us</a></li>
-            <li><a href="/faq" class="text-gray-400 hover:text-white">FAQ</a></li>
+            <li><a href="{{ url_for('user.index') }}" class="text-gray-400 hover:text-white">Home</a></li>
+            <li><a href="{{ url_for('user.shop') }}" class="text-gray-400 hover:text-white">Shop</a></li>
+            <li><a href="{{ url_for('user.about') }}" class="text-gray-400 hover:text-white">About Us</a></li>
+            <li><a href="{{ url_for('user.faq') }}" class="text-gray-400 hover:text-white">FAQ</a></li>
           </ul>
         </div>
         <div>

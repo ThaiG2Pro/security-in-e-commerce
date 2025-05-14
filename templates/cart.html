@@ -55,7 +55,7 @@
         </div>
         <div class="col-md-6 text-right">
           <h4>Total: <span class="text-success">${{ total|round(2) }}</span></h4>
-          <a href="/delivery" class="btn btn-primary mt-2">Proceed to Checkout</a>
+          <a href="{{ url_for('user.delivery') }}" class="btn btn-primary mt-2">Proceed to Checkout</a>
         </div>
       </div>
     </form>
