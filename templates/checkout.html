@@ -1,56 +1,91 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Checkout</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-  </head>
-  <body class="bg-gray-100 font-sans">
-    <div class="container mx-auto px-4 py-6 max-w-3xl">
-      <h1 class="text-3xl font-bold mb-6 text-gray-800">Checkout</h1>
-      {% if cart_items %} {% for item in cart_items %}
-      <div class="flex items-center bg-white rounded-lg shadow-sm p-4 mb-4">
-        <img
-          src="{{ url_for('static', filename=item[3]) }}"
-          alt="{{ item[1] }}"
-          class="w-24 h-24 object-cover rounded mr-4"
-        />
-        <div class="flex-1">
-          <h3 class="text-lg font-semibold text-gray-700">{{ item[1] }}</h3>
-          <p class="text-gray-600">Price: ${{ item[2] }}</p>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Checkout</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.4.4/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</head>
+<body class="bg-gray-100">
+  <nav class="bg-white p-4 shadow mb-4">
+    <div class="container mx-auto flex justify-between items-center">
+      <a href="/" class="text-xl font-bold">E-Commerce</a>
+      <div>
+        {% if user %}
+        <span class="mr-4">Hello, {{ user }}</span>
+        <a href="/logout" class="text-blue-500 hover:underline">Logout</a>
+        {% else %}
+        <a href="/login" class="mr-4 text-blue-500 hover:underline">Login</a>
+        <a href="/register" class="text-blue-500 hover:underline">Register</a>
+        {% endif %}
+        <a href="/cart" class="ml-4 text-blue-500 hover:underline">Cart</a>
+      </div>
+    </div>
+  </nav>
+  <div class="container bg-white rounded shadow p-4 mt-4">
+    <h2 class="mb-4 font-bold text-2xl">Checkout</h2>
+    <form id="checkoutForm">
+      <div class="row">
+        <div class="col-md-6">
+          <h5>Shipping Address</h5>
+          <input type="text" class="form-control mb-2" name="address" placeholder="Enter shipping address" required />
+          <!-- In a real app, list/select saved addresses here -->
+        </div>
+        <div class="col-md-6">
+          <h5>Payment Method</h5>
+          <input type="text" class="form-control mb-2" name="payment" placeholder="Enter payment method (e.g. Visa)" required />
+          <!-- In a real app, list/select saved payment methods here -->
         </div>
       </div>
-      {% endfor %}
-      <div class="text-right text-xl font-bold text-gray-800 mb-6">
-        Total: ${{ total }}
+      <div class="row mt-4">
+        <div class="col-md-6">
+          <h5>Shipping Method</h5>
+          <select class="form-control" name="shipping_method">
+            <option>Standard Shipping (3-5 days)</option>
+            <option>Express Shipping (1-2 days)</option>
+          </select>
+        </div>
+        <div class="col-md-6">
+          <h5>Order Summary</h5>
+          <ul class="list-group mb-2">
+            {% for item in cart_items %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              {{ item[1] }} x {{ item[-1] or 1 }}
+              <span>${{ ((item[3] + (item[-2] or 0)) * (item[-1] or 1))|round(2) }}</span>
+            </li>
+            {% endfor %}
+          </ul>
+          <div class="text-right font-bold">Total: ${{ total|round(2) }}</div>
+        </div>
       </div>
-      <button
-        class="fixed bottom-5 right-5 bg-orange-500 text-white font-bold py-3 px-6 rounded-lg shadow-lg hover:bg-orange-600 transition-colors"
-        onclick="confirmPurchase()"
-      >
-        Confirm Purchase
-      </button>
-      {% else %}
-      <p class="text-gray-600">Your cart is empty.</p>
-      {% endif %}
-      <a
-        href="{{ url_for('cart') }}"
-        class="block text-center text-blue-600 hover:underline mt-6"
-        >Back to Cart</a
-      >
-    </div>
-    <script>
-      function confirmPurchase() {
-        fetch("/checkout", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-        })
-          .then((response) => response.json())
-          .then((data) => alert(data.message))
-          .catch((error) => alert("Error: " + error));
-      }
-    </script>
-    {% if inject_script %} {{ script_content | safe }} {% endif %}
-  </body>
+      <div class="form-check mt-4">
+        <input class="form-check-input" type="checkbox" id="terms" required />
+        <label class="form-check-label" for="terms">
+          I agree to the terms and conditions
+        </label>
+      </div>
+      <div class="text-right mt-4">
+        <button type="submit" class="btn btn-success">Place Order</button>
+      </div>
+    </form>
+  </div>
+  <script>
+    document.getElementById('checkoutForm').onsubmit = function(e) {
+      e.preventDefault();
+      // In a real app, collect all form data and send to backend
+      fetch('/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: '' // Add serialized form data if needed
+      }).then(r => r.json()).then(data => {
+        alert(data.message || data.error);
+        if (data.message) window.location = '/orders';
+      });
+    };
+  </script>
+</body>
 </html>

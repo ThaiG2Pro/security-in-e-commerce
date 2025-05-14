@@ -1,0 +1,84 @@
+<!-- User Payment Methods Management Page -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Payment Methods - E-Commerce</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+    {% include 'navbar.html' %}
+    <div class="container mt-5 mb-5">
+        <h2 class="mb-4">My Payment Methods</h2>
+        <div class="row">
+            <div class="col-md-8">
+                {% if payment_methods %}
+                <div class="list-group mb-4">
+                    {% for method in payment_methods %}
+                    <div class="list-group-item mb-2">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>{{ method.payment_type|capitalize }}</strong> - {{ method.provider }}<br>
+                                **** **** **** {{ method.account_number[-4:] }}
+                                {% if method.expiry_date %}<span class="ms-2">(Exp: {{ method.expiry_date }})</span>{% endif %}
+                                {% if method.is_default %}<span class="badge bg-success ms-2">Default</span>{% endif %}
+                            </div>
+                            <div>
+                                <a href="/account/payment-methods/edit/{{ method.id }}" class="btn btn-sm btn-outline-primary me-2">Edit</a>
+                                <form action="/account/payment-methods/delete/{{ method.id }}" method="post" style="display:inline;">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this payment method?');">Delete</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted">No payment methods found. Add a new payment method below.</p>
+                {% endif %}
+                <a href="#add-payment-form" class="btn btn-primary">Add New Payment Method</a>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header bg-light">
+                        <strong>Add New Payment Method</strong>
+                    </div>
+                    <div class="card-body">
+                        <form id="add-payment-form" action="/account/payment-methods" method="post">
+                            <div class="mb-2">
+                                <label for="payment_type" class="form-label">Type</label>
+                                <select name="payment_type" id="payment_type" class="form-select" required>
+                                    <option value="credit_card">Credit Card</option>
+                                    <option value="debit_card">Debit Card</option>
+                                    <option value="paypal">PayPal</option>
+                                    <option value="bank">Bank Account</option>
+                                </select>
+                            </div>
+                            <div class="mb-2">
+                                <label for="provider" class="form-label">Provider</label>
+                                <input type="text" name="provider" id="provider" class="form-control" required>
+                            </div>
+                            <div class="mb-2">
+                                <label for="account_number" class="form-label">Account/Card Number</label>
+                                <input type="text" name="account_number" id="account_number" class="form-control" required maxlength="20">
+                            </div>
+                            <div class="mb-2">
+                                <label for="expiry_date" class="form-label">Expiry Date</label>
+                                <input type="text" name="expiry_date" id="expiry_date" class="form-control" placeholder="MM/YY">
+                            </div>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" name="is_default" id="is_default" value="1">
+                                <label class="form-check-label" for="is_default">Set as default</label>
+                            </div>
+                            <button type="submit" class="btn btn-success w-100">Save Payment Method</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <a href="/account" class="btn btn-link mt-4">&larr; Back to Account</a>
+    </div>
+    {% include 'footer.html' %}
+</body>
+</html>

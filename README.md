@@ -8,6 +8,7 @@ Requirements
 Setup Instructions
 Running Locally
 Deploying Online
+Database Migration (Alembic)
 Security Vulnerabilities
 Troubleshooting
 Contributing
@@ -77,6 +78,38 @@ The /reset-password and /register routes use request.headers.get('Host') without
 Test by modifying the Host header (e.g., using Burp Suite) to evil.com and checking the console for a link like http://evil.com/reset/<token>.
 
 Warning: Do not use this code in production without fixing these vulnerabilities.
+
+## Database Migration (Alembic)
+
+This project now uses [Alembic](https://alembic.sqlalchemy.org/) for database migrations.
+
+- For **local development**, the database schema is initialized automatically if `FLASK_ENV=development`.
+- For **production deployments** (e.g., Render), you must run Alembic migrations:
+
+```sh
+alembic upgrade head
+```
+
+This will apply all schema changes safely without dropping data.
+
+### Initial Setup
+1. Install dependencies:
+   ```sh
+   pip install -r requirements.txt
+   ```
+2. Set up your environment variables (see `.env.example` or Render dashboard).
+3. Run Alembic migrations:
+   ```sh
+   alembic upgrade head
+   ```
+
+### Deploying on Render
+- Ensure your Render build or start command includes:
+  ```sh
+  alembic upgrade head
+  ```
+- Do **not** use `init_db()` in production.
+
 Troubleshooting
 
 "User not verified" error:

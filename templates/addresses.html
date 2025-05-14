@@ -1,0 +1,95 @@
+<!-- User Address Management Page -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Manage Addresses - E-Commerce</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+    {% include 'navbar.html' %}
+    <div class="container mt-5 mb-5">
+        <h2 class="mb-4">My Addresses</h2>
+        <div class="row">
+            <div class="col-md-8">
+                {% if addresses %}
+                <div class="list-group mb-4">
+                    {% for address in addresses %}
+                    <div class="list-group-item mb-2">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>{{ address.address_type|capitalize }} Address</strong>
+                                {% if address.is_default %}<span class="badge bg-success ms-2">Default</span>{% endif %}<br>
+                                {{ address.address_line1 }}{% if address.address_line2 %}, {{ address.address_line2 }}{% endif %}<br>
+                                {{ address.city }}, {{ address.state }} {{ address.postal_code }}<br>
+                                {{ address.country }}
+                            </div>
+                            <div>
+                                <a href="/account/addresses/edit/{{ address.id }}" class="btn btn-sm btn-outline-primary me-2">Edit</a>
+                                <form action="/account/addresses/delete/{{ address.id }}" method="post" style="display:inline;">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this address?');">Delete</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted">No addresses found. Add a new address below.</p>
+                {% endif %}
+                <a href="#add-address-form" class="btn btn-primary">Add New Address</a>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header bg-light">
+                        <strong>Add New Address</strong>
+                    </div>
+                    <div class="card-body">
+                        <form id="add-address-form" action="/account/addresses" method="post">
+                            <div class="mb-2">
+                                <label for="address_type" class="form-label">Type</label>
+                                <select name="address_type" id="address_type" class="form-select" required>
+                                    <option value="shipping">Shipping</option>
+                                    <option value="billing">Billing</option>
+                                </select>
+                            </div>
+                            <div class="mb-2">
+                                <label for="address_line1" class="form-label">Address Line 1</label>
+                                <input type="text" name="address_line1" id="address_line1" class="form-control" required>
+                            </div>
+                            <div class="mb-2">
+                                <label for="address_line2" class="form-label">Address Line 2</label>
+                                <input type="text" name="address_line2" id="address_line2" class="form-control">
+                            </div>
+                            <div class="mb-2">
+                                <label for="city" class="form-label">City</label>
+                                <input type="text" name="city" id="city" class="form-control" required>
+                            </div>
+                            <div class="mb-2">
+                                <label for="state" class="form-label">State</label>
+                                <input type="text" name="state" id="state" class="form-control">
+                            </div>
+                            <div class="mb-2">
+                                <label for="postal_code" class="form-label">Postal Code</label>
+                                <input type="text" name="postal_code" id="postal_code" class="form-control" required>
+                            </div>
+                            <div class="mb-2">
+                                <label for="country" class="form-label">Country</label>
+                                <input type="text" name="country" id="country" class="form-control" required>
+                            </div>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" name="is_default" id="is_default" value="1">
+                                <label class="form-check-label" for="is_default">Set as default</label>
+                            </div>
+                            <button type="submit" class="btn btn-success w-100">Save Address</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <a href="/account" class="btn btn-link mt-4">&larr; Back to Account</a>
+    </div>
+    {% include 'footer.html' %}
+</body>
+</html>

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Order Details</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.4.4/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</head>
+<body class="bg-gray-100">
+  <nav class="bg-white p-4 shadow mb-4">
+    <div class="container mx-auto flex justify-between items-center">
+      <a href="/" class="text-xl font-bold">E-Commerce</a>
+      <div>
+        {% if user %}
+        <span class="mr-4">Hello, {{ user }}</span>
+        <a href="/logout" class="text-blue-500 hover:underline">Logout</a>
+        {% else %}
+        <a href="/login" class="mr-4 text-blue-500 hover:underline">Login</a>
+        <a href="/register" class="text-blue-500 hover:underline">Register</a>
+        {% endif %}
+        <a href="/cart" class="ml-4 text-blue-500 hover:underline">Cart</a>
+      </div>
+    </div>
+  </nav>
+  <div class="container bg-white rounded shadow p-4 mt-4">
+    <h2 class="mb-4 font-bold text-2xl">Order Details</h2>
+    <div class="mb-3">
+      <strong>Order ID:</strong> {{ order[0] }}<br />
+      <strong>Status:</strong> <span class="badge badge-info">{{ order[2] }}</span><br />
+      <strong>Order Date:</strong> {{ order[14] }}<br />
+      <strong>Tracking Number:</strong> {{ order[12] or 'N/A' }}
+    </div>
+    <h5>Items</h5>
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th>Product</th>
+          <th>Variant</th>
+          <th>Quantity</th>
+          <th>Price</th>
+          <th>Subtotal</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in items %}
+        <tr>
+          <td>
+            <img src="/static/{{ item[8] }}" alt="{{ item[7] }}" style="width:50px; height:50px; object-fit:cover;" class="rounded mr-2" />
+            {{ item[7] }}
+          </td>
+          <td>
+            {% if item[9] %}
+              {{ item[9] }}: {{ item[10] }}
+            {% else %}
+              -
+            {% endif %}
+          </td>
+          <td>{{ item[4] }}</td>
+          <td>${{ item[5]|round(2) }}</td>
+          <td>${{ (item[5] * item[4])|round(2) }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <div class="row mt-4">
+      <div class="col-md-6">
+        <h5>Shipping & Billing</h5>
+        <p>
+          <strong>Shipping Address ID:</strong> {{ order[4] or 'N/A' }}<br />
+          <strong>Billing Address ID:</strong> {{ order[5] or 'N/A' }}<br />
+        </p>
+      </div>
+      <div class="col-md-6 text-right">
+        <h5>Price Breakdown</h5>
+        <p>
+          <strong>Subtotal:</strong> ${{ order[3]|round(2) }}<br />
+          <strong>Shipping Fee:</strong> ${{ order[8]|round(2) }}<br />
+          <strong>Tax:</strong> ${{ order[9]|round(2) }}<br />
+          <strong>Discount:</strong> -${{ order[10]|round(2) }}<br />
+          <strong>Total:</strong> <span class="text-success">${{ (order[3] + order[8] + order[9] - order[10])|round(2) }}</span>
+        </p>
+        <p><strong>Payment Method ID:</strong> {{ order[6] or 'N/A' }}</p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

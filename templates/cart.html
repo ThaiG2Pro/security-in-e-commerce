@@ -3,43 +3,121 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Cart</title>
+    <title>Shopping Cart</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.4.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
   </head>
-  <body class="bg-gray-100 font-sans">
-    <div class="container mx-auto px-4 py-6 max-w-3xl">
-      <h1 class="text-3xl font-bold mb-6 text-gray-800">Your Cart</h1>
-      {% if cart_items %} {% for item in cart_items %}
-      <div class="flex items-center bg-white rounded-lg shadow-sm p-4 mb-4">
-        <img
-          src="{{ url_for('static', filename=item[3]) }}"
-          alt="{{ item[1] }}"
-          class="w-24 h-24 object-cover rounded mr-4"
-        />
-        <div class="flex-1">
-          <h3 class="text-lg font-semibold text-gray-700">{{ item[1] }}</h3>
-          <p class="text-gray-600">Price: ${{ item[2] }}</p>
+  <body class="bg-gray-100">
+    <nav class="bg-white p-4 shadow mb-4">
+      <div class="container mx-auto flex justify-between items-center">
+        <a href="/" class="text-xl font-bold">E-Commerce</a>
+        <div>
+          {% if user %}
+          <span class="mr-4">Hello, {{ user }}</span>
+          <a href="/logout" class="text-blue-500 hover:underline">Logout</a>
+          {% else %}
+          <a href="/login" class="mr-4 text-blue-500 hover:underline">Login</a>
+          <a href="/register" class="text-blue-500 hover:underline">Register</a>
+          {% endif %}
+          <a href="/cart" class="ml-4 text-blue-500 hover:underline">Cart</a>
         </div>
       </div>
-      {% endfor %}
-      <div class="text-right text-xl font-bold text-gray-800 mb-6">
-        Total: ${{ total }}
-      </div>
-      <a href="{{ url_for('delivery') }}">
-        <button
-          class="fixed bottom-5 right-5 bg-orange-500 text-white font-bold py-3 px-6 rounded-lg shadow-lg hover:bg-orange-600 transition-colors"
-        >
-          Proceed to Checkout
-        </button>
-      </a>
+    </nav>
+    <div class="container bg-white rounded shadow p-4 mt-4">
+      <h2 class="mb-4 font-bold text-2xl">Shopping Cart</h2>
+      {% if cart_items and cart_items|length > 0 %}
+      <form id="cartForm">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th>Variant</th>
+              <th>Price</th>
+              <th>Quantity</th>
+              <th>Subtotal</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in cart_items %}
+            <tr>
+              <td>
+                <img
+                  src="/static/{{ item[7] }}"
+                  alt="{{ item[1] }}"
+                  style="width:60px; height:60px; object-fit:cover;"
+                  class="rounded mr-2"
+                />
+                <span class="font-bold">{{ item[1] }}</span>
+              </td>
+              <td>
+                {% if item[-4] %}
+                {{ item[-4] }}: {{ item[-3] }}
+                {% if item[-2] and item[-2] != 0 %}
+                <span class="text-muted">(+${{ item[-2]|round(2) }})</span>
+                {% endif %}
+                {% else %}
+                -
+                {% endif %}
+              </td>
+              <td>
+                ${{ (item[3] + (item[-2] or 0))|round(2) }}
+              </td>
+              <td>
+                <input
+                  type="number"
+                  name="quantity_{{ item[0] }}_{{ item[-3] or 'none' }}"
+                  value="{{ item[-1] }}"
+                  min="1"
+                  class="form-control w-24"
+                />
+              </td>
+              <td>
+                ${{ ((item[3] + (item[-2] or 0)) * (item[-1] or 1))|round(2) }}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        <div class="row mt-4">
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="coupon">Coupon Code:</label>
+              <input
+                type="text"
+                class="form-control w-48 d-inline-block"
+                id="coupon"
+                name="coupon"
+                placeholder="Enter coupon code"
+              />
+              <button
+                type="button"
+                class="btn btn-outline-primary ml-2"
+                onclick="applyCoupon()"
+              >
+                Apply
+              </button>
+            </div>
+          </div>
+          <div class="col-md-6 text-right">
+            <h4>Total: <span class="text-success">${{ total|round(2) }}</span></h4>
+            <a href="/delivery" class="btn btn-primary mt-2">Proceed to Checkout</a>
+          </div>
+        </div>
+      </form>
       {% else %}
-      <p class="text-gray-600">Your cart is empty.</p>
+      <p>Your cart is empty.</p>
       {% endif %}
-      <a
-        href="{{ url_for('index') }}"
-        class="block text-center text-blue-600 hover:underline mt-6"
-        >Continue Shopping</a
-      >
     </div>
+    <script>
+      function applyCoupon() {
+        alert("Coupon feature coming soon!");
+      }
+    </script>
   </body>
 </html>
