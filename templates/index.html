@@ -20,6 +20,9 @@
         <div>
           {% if user %}
           <span class="mr-4">Hello, {{ user }}</span>
+          {% if session['role'] == 'admin' %}
+          <a href="/admin" class="mr-4 text-red-500 hover:underline">Admin Dashboard</a>
+          {% endif %}
           <a href="/logout" class="text-blue-500 hover:underline">Logout</a>
           {% else %}
           <a href="/login" class="mr-4 text-blue-500 hover:underline">Login</a>

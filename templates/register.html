@@ -28,6 +28,14 @@
             required
           />
         </div>
+        <!-- Role selection for demo/dev only. Hide with CSS or remove in production. -->
+        <div class="mb-4" style="display:none">
+          <label for="role" class="block text-gray-700">Role</label>
+          <select name="role" class="w-full p-2 border rounded">
+            <option value="user" selected>User</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
         <button
           type="submit"
           class="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600"

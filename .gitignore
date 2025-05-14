@@ -50,5 +50,6 @@ media/
 secrets.json
 config.json
 
-image_of_internet
-resize.py 
+image_of_internet/
+
+
