@@ -19,14 +19,25 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
-    # Product categories
+    # 1. Tables with no dependencies
+    op.execute('''CREATE TABLE IF NOT EXISTS users (
+        email TEXT PRIMARY KEY,
+        password TEXT NOT NULL,
+        first_name TEXT,
+        last_name TEXT,
+        phone TEXT,
+        verified INTEGER DEFAULT 0,
+        balance REAL DEFAULT 10000000,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        last_login TIMESTAMP
+    )''')
     op.execute('''CREATE TABLE IF NOT EXISTS product_categories (
         id SERIAL PRIMARY KEY,
         name TEXT NOT NULL,
         description TEXT,
         parent_id INTEGER REFERENCES product_categories(id)
     )''')
-    # Products
+    # 2. Tables that reference above
     op.execute('''CREATE TABLE IF NOT EXISTS products (
         id SERIAL PRIMARY KEY,
         name TEXT NOT NULL,
@@ -42,38 +53,6 @@ def upgrade() -> None:
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )''')
-    # Product variants
-    op.execute('''CREATE TABLE IF NOT EXISTS product_variants (
-        id SERIAL PRIMARY KEY,
-        product_id INTEGER REFERENCES products(id) ON DELETE CASCADE,
-        variant_type TEXT,
-        variant_value TEXT,
-        price_modifier REAL DEFAULT 0,
-        sku TEXT UNIQUE,
-        stock_quantity INTEGER DEFAULT 0
-    )''')
-    # Product reviews
-    op.execute('''CREATE TABLE IF NOT EXISTS product_reviews (
-        id SERIAL PRIMARY KEY,
-        product_id INTEGER REFERENCES products(id) ON DELETE CASCADE,
-        user_email TEXT REFERENCES users(email) ON DELETE SET NULL,
-        rating INTEGER CHECK (rating BETWEEN 1 AND 5),
-        comment TEXT,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )''')
-    # Users
-    op.execute('''CREATE TABLE IF NOT EXISTS users (
-        email TEXT PRIMARY KEY,
-        password TEXT NOT NULL,
-        first_name TEXT,
-        last_name TEXT,
-        phone TEXT,
-        verified INTEGER DEFAULT 0,
-        balance REAL DEFAULT 10000000,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        last_login TIMESTAMP
-    )''')
-    # User addresses
     op.execute('''CREATE TABLE IF NOT EXISTS user_addresses (
         id SERIAL PRIMARY KEY,
         user_email TEXT REFERENCES users(email) ON DELETE CASCADE,
@@ -86,7 +65,6 @@ def upgrade() -> None:
         is_default BOOLEAN DEFAULT FALSE,
         address_type TEXT
     )''')
-    # User payment methods
     op.execute('''CREATE TABLE IF NOT EXISTS user_payment_methods (
         id SERIAL PRIMARY KEY,
         user_email TEXT REFERENCES users(email) ON DELETE CASCADE,
@@ -96,7 +74,16 @@ def upgrade() -> None:
         expiry_date TEXT,
         is_default BOOLEAN DEFAULT FALSE
     )''')
-    # Orders
+    op.execute('''CREATE TABLE IF NOT EXISTS product_variants (
+        id SERIAL PRIMARY KEY,
+        product_id INTEGER REFERENCES products(id) ON DELETE CASCADE,
+        variant_type TEXT,
+        variant_value TEXT,
+        price_modifier REAL DEFAULT 0,
+        sku TEXT UNIQUE,
+        stock_quantity INTEGER DEFAULT 0
+    )''')
+    # 3. Tables that reference above
     op.execute('''CREATE TABLE IF NOT EXISTS orders (
         id TEXT PRIMARY KEY,
         user_email TEXT REFERENCES users(email) ON DELETE SET NULL,
@@ -113,7 +100,14 @@ def upgrade() -> None:
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )''')
-    # Order items
+    op.execute('''CREATE TABLE IF NOT EXISTS product_reviews (
+        id SERIAL PRIMARY KEY,
+        product_id INTEGER REFERENCES products(id) ON DELETE CASCADE,
+        user_email TEXT REFERENCES users(email) ON DELETE SET NULL,
+        rating INTEGER CHECK (rating BETWEEN 1 AND 5),
+        comment TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )''')
     op.execute('''CREATE TABLE IF NOT EXISTS order_items (
         id SERIAL PRIMARY KEY,
         order_id TEXT REFERENCES orders(id) ON DELETE CASCADE,
@@ -123,7 +117,6 @@ def upgrade() -> None:
         price REAL NOT NULL,
         discount REAL DEFAULT 0
     )''')
-    # Cart
     op.execute('''CREATE TABLE IF NOT EXISTS cart (
         id SERIAL PRIMARY KEY,
         user_email TEXT REFERENCES users(email) ON DELETE CASCADE,
@@ -134,7 +127,6 @@ def upgrade() -> None:
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         UNIQUE(user_email, product_id, product_variant_id)
     )''')
-    # Wishlist
     op.execute('''CREATE TABLE IF NOT EXISTS wishlists (
         id SERIAL PRIMARY KEY,
         user_email TEXT REFERENCES users(email) ON DELETE CASCADE,
@@ -142,7 +134,6 @@ def upgrade() -> None:
         added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         UNIQUE(user_email, product_id)
     )''')
-    # Coupons
     op.execute('''CREATE TABLE IF NOT EXISTS coupons (
         id SERIAL PRIMARY KEY,
         code TEXT UNIQUE NOT NULL,
@@ -155,7 +146,6 @@ def upgrade() -> None:
         usage_limit INTEGER,
         usage_count INTEGER DEFAULT 0
     )''')
-    # Shipping methods
     op.execute('''CREATE TABLE IF NOT EXISTS shipping_methods (
         id SERIAL PRIMARY KEY,
         name TEXT NOT NULL,
@@ -163,7 +153,6 @@ def upgrade() -> None:
         price REAL NOT NULL,
         estimated_days TEXT
     )''')
-    # Verification and reset tokens
     op.execute('''CREATE TABLE IF NOT EXISTS verification (
         email TEXT PRIMARY KEY, token TEXT)''')
     op.execute('''CREATE TABLE IF NOT EXISTS reset_tokens (
