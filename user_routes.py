@@ -8,6 +8,15 @@ from utils import add_security_headers
 
 user_bp = Blueprint('user', __name__)
 
+@user_bp.route('/')
+def index():
+    conn = get_db_connection()
+    c = conn.cursor()
+    c.execute('SELECT * FROM products ORDER BY id DESC')
+    products = c.fetchall()
+    conn.close()
+    return render_template('index.html', products=products, user=session.get('user'))
+
 @user_bp.route('/register', methods=['GET', 'POST'])
 def register():
     add_security_headers()
@@ -300,3 +309,16 @@ def manage_payment_methods():
     payment_methods = c.fetchall()
     conn.close()
     return render_template('payment_methods.html', payment_methods=payment_methods, user=user_email)
+
+@user_bp.route('/product/<int:product_id>')
+def product_detail(product_id):
+    conn = get_db_connection()
+    c = conn.cursor()
+    c.execute('SELECT * FROM products WHERE id = %s', (product_id,))
+    product = c.fetchone()
+    c.execute('SELECT * FROM product_variants WHERE product_id = %s', (product_id,))
+    variants = c.fetchall()
+    c.execute('SELECT * FROM product_reviews WHERE product_id = %s', (product_id,))
+    reviews = c.fetchall()
+    conn.close()
+    return render_template('product_detail.html', product=product, variants=variants, reviews=reviews, user=session.get('user'))

@@ -1,0 +1,9 @@
+{% extends 'admin_dashboard.html' %}
+{% block content %}
+<h2>Image Gallery</h2>
+<ul>
+  {% for img in images %}
+    <li><img src="/static/images/{{ img }}" alt="{{ img }}" style="max-width:120px;max-height:120px;"> {{ img }}</li>
+  {% endfor %}
+</ul>
+{% endblock %}

@@ -175,6 +175,7 @@ def init_db():
     conn.close()
 
 def populate_sample_data():
+    import hashlib
     conn = get_db_connection()
     c = conn.cursor()
     # Add product categories if missing
@@ -184,11 +185,31 @@ def populate_sample_data():
         c.execute("INSERT INTO product_categories (name, description) VALUES (%s, %s)", ('Bakery', 'Cakes and pastries'))
     # Add products if missing
     c.execute("SELECT COUNT(*) FROM products")
-    if c.fetchone()[0] < 1:
+    if c.fetchone()[0] < 5:
+        # Get category ids
         c.execute("SELECT id FROM product_categories WHERE name = %s", ('Beverages',))
         beverages_id = c.fetchone()[0]
+        c.execute("SELECT id FROM product_categories WHERE name = %s", ('Bakery',))
+        bakery_id = c.fetchone()[0]
+        # Insert sample beverages
         c.execute('INSERT INTO products (name, price, image, description, sku, stock_quantity, category_id) VALUES (%s, %s, %s, %s, %s, %s, %s)',
-                  ('Demo Coffee', 10.0, 'images/bacxiu.jpg', 'A demo coffee product', 'SKU-DEMO', 100, beverages_id))
+                  ('Bac Xiu', 18.0, 'images/bacxiu.jpg', 'Vietnamese iced coffee with condensed milk', 'SKU-BACXIU', 50, beverages_id))
+        c.execute('INSERT INTO products (name, price, image, description, sku, stock_quantity, category_id) VALUES (%s, %s, %s, %s, %s, %s, %s)',
+                  ('Caphe Sua', 20.0, 'images/caphesua.jpg', 'Traditional Vietnamese coffee with milk', 'SKU-CAPHESUA', 60, beverages_id))
+        c.execute('INSERT INTO products (name, price, image, description, sku, stock_quantity, category_id) VALUES (%s, %s, %s, %s, %s, %s, %s)',
+                  ('Tra Dao', 22.0, 'images/tradao.jpg', 'Peach tea with real fruit', 'SKU-TRADAO', 40, beverages_id))
+        # Insert sample bakery
+        c.execute('INSERT INTO products (name, price, image, description, sku, stock_quantity, category_id) VALUES (%s, %s, %s, %s, %s, %s, %s)',
+                  ('Banh Bong Lan', 25.0, 'images/banhbonglan.jpg', 'Soft sponge cake', 'SKU-BANHBONGLAN', 30, bakery_id))
+        c.execute('INSERT INTO products (name, price, image, description, sku, stock_quantity, category_id) VALUES (%s, %s, %s, %s, %s, %s, %s)',
+                  ('Banh Chocolate', 28.0, 'images/banhchocolate.jpg', 'Rich chocolate cake', 'SKU-BANHCHOCOLATE', 25, bakery_id))
+    # Add default admin user if missing
+    c.execute("SELECT COUNT(*) FROM users WHERE role = 'admin'")
+    if c.fetchone()[0] == 0:
+        admin_email = 'admin@example.com'
+        admin_password = hashlib.sha256('admin123'.encode()).hexdigest()
+        c.execute("INSERT INTO users (email, password, verified, balance, role) VALUES (%s, %s, %s, %s, %s)",
+                  (admin_email, admin_password, 1, 10000000, 'admin'))
     # Add shipping methods if missing
     c.execute("SELECT COUNT(*) FROM shipping_methods")
     if c.fetchone()[0] == 0:
@@ -205,3 +226,8 @@ def populate_sample_data():
                   ('FREESHIP', 'fixed', 5, 20, True))
     conn.commit()
     conn.close()
+
+# Call sample data population on startup
+defined = globals().get('populate_sample_data')
+if defined:
+    populate_sample_data()
