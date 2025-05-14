@@ -10,10 +10,10 @@ import os
 # access to the values within the .ini file in use.
 config = context.config
 
-if config.get_main_option("sqlalchemy.url").startswith("%("):
-    config.set_main_option(
-        "sqlalchemy.url", os.environ["DATABASE_URL"]
-    )
+# Set the sqlalchemy.url from the DATABASE_URL environment variable
+database_url = os.environ.get("DATABASE_URL")
+if database_url:
+    config.set_main_option("sqlalchemy.url", database_url)
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
