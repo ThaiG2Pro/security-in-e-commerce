@@ -8,6 +8,19 @@ from urllib.parse import urlparse, unquote
 app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY', 'your-secret-key')
 
+# Kết nối PostgreSQL
+def get_db_connection():
+    db_url = os.getenv('DATABASE_URL')
+    parsed_url = urlparse(db_url)
+    conn = psycopg2.connect(
+        database=parsed_url.path[1:],
+        user=parsed_url.username,
+        password=parsed_url.password,
+        host=parsed_url.hostname,
+        port=parsed_url.port
+    )
+    return conn
+
 # Khởi tạo database (for local development and first-time production setup)
 def is_db_empty():
     conn = get_db_connection()
@@ -229,19 +242,6 @@ def add_security_headers():
             response.headers['X-Frame-Options'] = 'DENY'
             response.headers['Content-Security-Policy'] = "frame-ancestors 'none'"
             return response
-
-# Kết nối PostgreSQL
-def get_db_connection():
-    db_url = os.getenv('DATABASE_URL')
-    parsed_url = urlparse(db_url)
-    conn = psycopg2.connect(
-        database=parsed_url.path[1:],
-        user=parsed_url.username,
-        password=parsed_url.password,
-        host=parsed_url.hostname,
-        port=parsed_url.port
-    )
-    return conn
 
 # Mock data cho clickjacking
 def get_mock_cart():
