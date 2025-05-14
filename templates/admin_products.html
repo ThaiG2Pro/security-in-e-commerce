@@ -34,7 +34,9 @@
             <td class="py-2 px-4 border-b">{{ p[6] }}</td>
             <td class="py-2 px-4 border-b">
               <a href="/admin/edit-product/{{ p[0] }}" class="text-blue-500 hover:underline mr-2">Edit</a>
-              <a href="/admin/delete-product/{{ p[0] }}" class="text-red-500 hover:underline" onclick="return confirm('Delete this product?')">Delete</a>
+              <form action="/admin/delete-product/{{ p[0] }}" method="POST" style="display:inline;">
+                <button type="submit" class="text-red-500 hover:underline" onclick="return confirm('Delete this product?')">Delete</button>
+              </form>
             </td>
           </tr>
           {% endfor %}

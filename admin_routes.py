@@ -15,7 +15,7 @@ def admin_dashboard():
 def admin_products():
     conn = get_db_connection()
     c = conn.cursor()
-    c.execute('SELECT p.*, c.name as category_name FROM products p LEFT JOIN product_categories c ON p.category_id = c.id ORDER BY p.id DESC')
+    c.execute('SELECT * FROM products ORDER BY id DESC')
     products = c.fetchall()
     conn.close()
     return render_template('admin_products.html', products=products, user=session.get('user'))
@@ -38,10 +38,24 @@ def admin_add_product():
         conn.commit()
         conn.close()
         return redirect(url_for('admin.admin_products'))
-    c.execute('SELECT id, name FROM product_categories ORDER BY name')
-    categories = c.fetchall()
+
     conn.close()
     return render_template('admin_add_product.html', categories=categories, user=session.get('user'))
+
+@admin_bp.route('/delete-product/<int:product_id>', methods=['POST'])
+@admin_required
+def delete_product(product_id):
+    conn = get_db_connection()
+    c = conn.cursor()
+    try:
+        c.execute('DELETE FROM products WHERE id = %s', (product_id,))
+        conn.commit()
+    except Exception as e:
+        conn.rollback()
+        return f"An error occurred: {e}", 500
+    finally:
+        conn.close()
+    return redirect(url_for('admin.admin_products'))
 
 @admin_bp.route('/categories')
 @admin_required

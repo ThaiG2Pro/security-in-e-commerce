@@ -34,14 +34,6 @@
           <label class="block text-gray-700">Stock Quantity</label>
           <input type="number" name="stock_quantity" class="w-full p-2 border rounded" required />
         </div>
-        <div class="mb-4">
-          <label class="block text-gray-700">Category</label>
-          <select name="category_id" class="w-full p-2 border rounded" required>
-            {% for cat in categories %}
-            <option value="{{ cat[0] }}">{{ cat[1] }}</option>
-            {% endfor %}
-          </select>
-        </div>
         <button type="submit" class="w-full bg-green-500 text-white p-2 rounded hover:bg-green-600">Add Product</button>
       </form>
       <a href="/admin/products" class="block mt-6 text-blue-500 hover:underline text-center">Back to Products</a>

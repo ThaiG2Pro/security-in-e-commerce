@@ -49,14 +49,6 @@
         <div class="hidden md:flex space-x-8">
           <a href="/" class="text-gray-700 hover:text-amber-600">Home</a>
           <a href="/shop" class="text-gray-700 hover:text-amber-600">Shop</a>
-          <div class="relative group">
-            <a href="#" class="text-gray-700 hover:text-amber-600">Categories</a>
-            <div class="absolute z-10 hidden bg-white shadow-lg group-hover:block w-48 py-2">
-              {% for category in categories %}
-              <a href="/?category_id={{ category[0] }}" class="block px-4 py-2 text-gray-700 hover:bg-amber-100">{{ category[1] }}</a>
-              {% endfor %}
-            </div>
-          </div>
           <a href="/about" class="text-gray-700 hover:text-amber-600">About Us</a>
           <a href="/faq" class="text-gray-700 hover:text-amber-600">FAQ</a>
         </div>
@@ -84,25 +76,6 @@
       <h1 class="text-4xl md:text-5xl font-bold mb-4">Authentic Vietnamese Flavors</h1>
       <p class="text-xl mb-8">Traditional beverages and bakery items made with care and premium ingredients</p>
       <a href="/shop" class="bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 px-6 rounded-full">SHOP NOW</a>
-    </div>
-  </section>
-
-  <!-- Category Showcase -->
-  <section class="py-12 bg-white">
-    <div class="container mx-auto px-4">
-      <h2 class="text-3xl font-bold text-center mb-12">Our Collection</h2>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-        {% for category in categories[:3] %}
-        <div class="category-card rounded-lg shadow overflow-hidden">
-          <img src="/static/images/category-{{ category[0] }}.jpg" alt="{{ category[1] }}" class="w-full h-64 object-cover">
-          <div class="p-6 text-center">
-            <h3 class="text-xl font-bold mb-2">{{ category[1] }}</h3>
-            <p class="text-gray-600 mb-4">{{ category[2] }}</p>
-            <a href="/?category_id={{ category[0] }}" class="inline-block border-2 border-amber-600 text-amber-600 hover:bg-amber-600 hover:text-white py-2 px-4 rounded">EXPLORE</a>
-          </div>
-        </div>
-        {% endfor %}
-      </div>
     </div>
   </section>
 
@@ -152,14 +125,6 @@
             <li><a href="/shop" class="text-gray-400 hover:text-white">Shop</a></li>
             <li><a href="/about" class="text-gray-400 hover:text-white">About Us</a></li>
             <li><a href="/faq" class="text-gray-400 hover:text-white">FAQ</a></li>
-          </ul>
-        </div>
-        <div>
-          <h3 class="text-lg font-bold mb-4">Categories</h3>
-          <ul class="space-y-2">
-            {% for category in categories[:4] %}
-            <li><a href="/?category_id={{ category[0] }}" class="text-gray-400 hover:text-white">{{ category[1] }}</a></li>
-            {% endfor %}
           </ul>
         </div>
         <div>
