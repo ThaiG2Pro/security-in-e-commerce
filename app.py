@@ -8,8 +8,16 @@ from urllib.parse import urlparse, unquote
 app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY', 'your-secret-key')
 
-# Khởi tạo database (for local development only)
-if os.getenv('FLASK_ENV', 'development') == 'development':
+# Khởi tạo database (for local development and first-time production setup)
+def is_db_empty():
+    conn = get_db_connection()
+    c = conn.cursor()
+    c.execute("SELECT to_regclass('public.users')")
+    exists = c.fetchone()[0] is not None
+    conn.close()
+    return not exists
+
+if os.getenv('FLASK_ENV', 'development') == 'development' or is_db_empty():
     def init_db():
         conn = get_db_connection()
         c = conn.cursor()
@@ -205,7 +213,7 @@ if os.getenv('FLASK_ENV', 'development') == 'development':
 
     init_db()
     populate_sample_data()
-# In production, use Alembic migrations instead of init_db()
+# In production, use Alembic migrations for future schema changes
 # To migrate: alembic upgrade head
 
 # Cấu hình session cookie
