@@ -173,19 +173,39 @@ def populate_sample_data():
     c = conn.cursor()
     # Add products if missing
     c.execute("SELECT COUNT(*) FROM products")
-    if c.fetchone()[0] < 5:
+    if c.fetchone()[0] < 14:
         # Insert sample beverages
         c.execute('INSERT INTO products (name, price, image, description, sku, stock_quantity) VALUES (%s, %s, %s, %s, %s, %s)',
-                  ('Bac Xiu', 18.0, 'images/bacxiu.jpg', 'Vietnamese iced coffee with condensed milk', 'SKU-BACXIU', 50))
+              ('Bac Xiu', 18.0, 'static/bacxiu.jpg', 'Vietnamese iced coffee with condensed milk', 'SKU-BACXIU', 50))
         c.execute('INSERT INTO products (name, price, image, description, sku, stock_quantity) VALUES (%s, %s, %s, %s, %s, %s)',
-                  ('Caphe Sua', 20.0, 'images/caphesua.jpg', 'Traditional Vietnamese coffee with milk', 'SKU-CAPHESUA', 60))
+              ('Caphe Sua', 20.0, 'static/caphesua.jpg', 'Traditional Vietnamese coffee with milk', 'SKU-CAPHESUA', 60))
         c.execute('INSERT INTO products (name, price, image, description, sku, stock_quantity) VALUES (%s, %s, %s, %s, %s, %s)',
-                  ('Tra Dao', 22.0, 'images/tradao.jpg', 'Peach tea with real fruit', 'SKU-TRADAO', 40))
+              ('Tra Dao', 22.0, 'static/tradao.jpg', 'Peach tea with real fruit', 'SKU-TRADAO', 40))
         # Insert sample bakery
         c.execute('INSERT INTO products (name, price, image, description, sku, stock_quantity) VALUES (%s, %s, %s, %s, %s, %s)',
-                  ('Banh Bong Lan', 25.0, 'images/banhbonglan.jpg', 'Soft sponge cake', 'SKU-BANHBONGLAN', 30))
+              ('Banh Bong Lan', 25.0, 'static/banhbonglan.jpg', 'Soft sponge cake', 'SKU-BANHBONGLAN', 30))
         c.execute('INSERT INTO products (name, price, image, description, sku, stock_quantity) VALUES (%s, %s, %s, %s, %s, %s)',
-                  ('Banh Chocolate', 28.0, 'images/banhchocolate.jpg', 'Rich chocolate cake', 'SKU-BANHCHOCOLATE', 25))
+              ('Banh Chocolate', 28.0, 'static/banhchocolate.jpg', 'Rich chocolate cake', 'SKU-BANHCHOCOLATE', 25))
+        # Insert new products
+        c.execute('INSERT INTO products (name, price, image, description, sku, stock_quantity) VALUES (%s, %s, %s, %s, %s, %s)',
+              ('Hoa Cuc Tea', 24.0, 'static/hoacuc.jpg', 'Chrysanthemum tea with honey', 'SKU-HOACUC', 35))
+        c.execute('INSERT INTO products (name, price, image, description, sku, stock_quantity) VALUES (%s, %s, %s, %s, %s, %s)',
+              ('Tiramisu', 30.0, 'static/tiramisu.jpg', 'Italian coffee-flavored dessert', 'SKU-TIRAMISU', 20))
+        # Add new beverages
+        c.execute('INSERT INTO products (name, price, image, description, sku, stock_quantity) VALUES (%s, %s, %s, %s, %s, %s)',
+              ('Americano', 22.0, 'static/americano.jpg', 'Espresso diluted with hot water', 'SKU-AMERICANO', 45))
+        c.execute('INSERT INTO products (name, price, image, description, sku, stock_quantity) VALUES (%s, %s, %s, %s, %s, %s)',
+              ('Caphe Muoi', 23.0, 'static/caphemuoi.jpg', 'Vietnamese salted coffee', 'SKU-CAPHEMUOI', 40))
+        c.execute('INSERT INTO products (name, price, image, description, sku, stock_quantity) VALUES (%s, %s, %s, %s, %s, %s)',
+              ('Caphe Trung', 25.0, 'static/caphetrung.jpg', 'Vietnamese egg coffee', 'SKU-CAPHETRUNG', 35))
+        c.execute('INSERT INTO products (name, price, image, description, sku, stock_quantity) VALUES (%s, %s, %s, %s, %s, %s)',
+              ('Cappuccino', 24.0, 'static/cappuccino.jpg', 'Espresso with steamed milk foam', 'SKU-CAPPUCCINO', 50))
+        c.execute('INSERT INTO products (name, price, image, description, sku, stock_quantity) VALUES (%s, %s, %s, %s, %s, %s)',
+              ('Flat White', 23.0, 'static/flatwhite.jpg', 'Espresso with microfoam', 'SKU-FLATWHITE', 45))
+        c.execute('INSERT INTO products (name, price, image, description, sku, stock_quantity) VALUES (%s, %s, %s, %s, %s, %s)',
+              ('Tra Cam Xa', 21.0, 'static/tracamxa.jpg', 'Citrus tea with lemongrass', 'SKU-TRACAMXA', 40))
+        c.execute('INSERT INTO products (name, price, image, description, sku, stock_quantity) VALUES (%s, %s, %s, %s, %s, %s)',
+              ('Tra Chanh', 19.0, 'static/trachanh.jpg', 'Vietnamese iced lemon tea', 'SKU-TRACHANH', 55))
     # Add default admin user if missing
     c.execute("SELECT COUNT(*) FROM users WHERE role = 'admin'")
     if c.fetchone()[0] == 0:

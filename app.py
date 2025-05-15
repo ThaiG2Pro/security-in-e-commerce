@@ -16,6 +16,10 @@ app.config['SESSION_COOKIE_SAMESITE'] = 'None'
 app.config['SESSION_COOKIE_SECURE'] = True
 app.config['SESSION_COOKIE_HTTPONLY'] = True
 
+@app.route('/unauthorized')
+def unauthorized():
+    return render_template('unauthorized.html')
+
 app.register_blueprint(admin_bp)
 app.register_blueprint(user_bp)
 

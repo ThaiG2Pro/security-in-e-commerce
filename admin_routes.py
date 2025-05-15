@@ -43,7 +43,7 @@ def admin_add_product():
     conn.close()
     return render_template('admin_add_product.html', user=session.get('user'))
 
-@admin_bp.route('/delete-product/<int:product_id>', methods=['POST'])
+@admin_bp.route('/delete_product/<int:product_id>', methods=['POST'])
 @admin_required
 def delete_product(product_id):
     conn = get_db_connection()
@@ -105,7 +105,7 @@ def admin_images():
     images = [f for f in os.listdir(image_dir) if f.endswith('.jpg') or f.endswith('.png')]
     return render_template('admin_images.html', images=images, user=session.get('user'))
 
-@admin_bp.route('/edit-product/<int:product_id>', methods=['GET', 'POST'])
+@admin_bp.route('/admin_edit_product/<int:product_id>', methods=['GET', 'POST'])
 @admin_required
 def admin_edit_product(product_id):
     conn = get_db_connection()

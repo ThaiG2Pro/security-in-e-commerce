@@ -1,5 +1,5 @@
 # user_routes.py
-from flask import Blueprint, render_template, request, redirect, url_for, session, jsonify
+from flask import Blueprint, render_template, request, redirect, url_for, session, jsonify, flash
 import hashlib
 import uuid
 import psycopg2
@@ -178,7 +178,160 @@ def add_to_cart():
     conn.close()
     return jsonify({'message': 'Added to cart'})
 
-@user_bp.route('/delivery')
+@user_bp.route('/update_cart', methods=['POST'])
+def update_cart():
+    add_security_headers()
+    if 'user' not in session:
+        return jsonify({'error': 'Please login to update cart'}), 401
+    
+    email = session['user']
+    conn = get_db_connection()
+    c = conn.cursor()
+    
+    try:
+        # Process all form fields
+        for key, value in request.form.items():
+            if key.startswith('quantity_'):
+                parts = key.split('_')
+                if len(parts) >= 3:
+                    product_id = parts[1]
+                    variant_value = parts[2]
+                    quantity = int(value)
+                    
+                    if quantity <= 0:
+                        # Remove item if quantity is zero or negative
+                        if variant_value == 'none':
+                            c.execute("DELETE FROM cart WHERE user_email = %s AND product_id = %s AND product_variant_id IS NULL", 
+                                     (email, product_id))
+                        else:
+                            c.execute("""DELETE FROM cart 
+                                      WHERE user_email = %s AND product_id = %s 
+                                      AND product_variant_id IN (SELECT id FROM product_variants 
+                                                                WHERE variant_value = %s)""", 
+                                     (email, product_id, variant_value))
+                    else:
+                        # Update quantity
+                        if variant_value == 'none':
+                            c.execute("UPDATE cart SET quantity = %s WHERE user_email = %s AND product_id = %s AND product_variant_id IS NULL", 
+                                     (quantity, email, product_id))
+                        else:
+                            c.execute("""UPDATE cart SET quantity = %s 
+                                      WHERE user_email = %s AND product_id = %s 
+                                      AND product_variant_id IN (SELECT id FROM product_variants 
+                                                                WHERE variant_value = %s)""", 
+                                     (quantity, email, product_id, variant_value))
+        
+        conn.commit()
+        
+        # Recalculate totals to return updated cart data
+        c.execute('''SELECT p.*, pv.variant_type, pv.variant_value, pv.price_modifier, c.quantity 
+                   FROM products p JOIN cart c ON p.id = c.product_id 
+                   LEFT JOIN product_variants pv ON pv.id = c.product_variant_id 
+                   WHERE c.user_email = %s''', (email,))
+        cart_items = c.fetchall()
+        
+        total = 0
+        items_data = []
+        
+        for item in cart_items:
+            price = float(item[3])
+            if item[-2]:
+                price += float(item[-2])
+            subtotal = price * (item[-1] or 1)
+            total += subtotal
+            
+            items_data.append({
+                'product_id': item[0],
+                'name': item[1],
+                'quantity': item[-1],
+                'price': price,
+                'subtotal': subtotal,
+                'variant_value': item[-3] or 'none'
+            })
+        
+        return jsonify({
+            'success': True,
+            'items': items_data,
+            'total': total
+        })
+        
+    except Exception as e:
+        conn.rollback()
+        return jsonify({'error': str(e)}), 500
+    finally:
+        conn.close()
+
+@user_bp.route('/add_to_wishlist', methods=['POST'])
+def add_to_wishlist():
+    if 'user' not in session:
+        return jsonify({'error': 'Please log in to add items to your wishlist'}), 401
+    
+    user_email = session['user']
+    product_id = request.form.get('product_id')
+    
+    if not product_id:
+        return jsonify({'error': 'Product ID is required'}), 400
+    
+    conn = get_db_connection()
+    c = conn.cursor()
+    
+    try:
+        # Check if product exists
+        c.execute('SELECT * FROM products WHERE id = %s', (product_id,))
+        if not c.fetchone():
+            conn.close()
+            return jsonify({'error': 'Product not found'}), 404
+        
+        # Check if already in wishlist
+        c.execute('SELECT * FROM wishlists WHERE user_email = %s AND product_id = %s', 
+                 (user_email, product_id))
+        if c.fetchone():
+            conn.close()
+            return jsonify({'message': 'Product already in your wishlist'})
+        
+        # Add to wishlist
+        c.execute('INSERT INTO wishlists (user_email, product_id, added_at) VALUES (%s, %s, NOW())', 
+                 (user_email, product_id))
+        conn.commit()
+        conn.close()
+        return jsonify({'message': 'Added to wishlist successfully'})
+    
+    except Exception as e:
+        conn.rollback()
+        conn.close()
+        return jsonify({'error': str(e)}), 500
+
+@user_bp.route('/remove_from_wishlist', methods=['POST'])
+def remove_from_wishlist():
+    if 'user' not in session:
+        return redirect(url_for('user.login'))
+    
+    user_email = session['user']
+    product_id = request.form.get('product_id')
+    
+    if not product_id:
+        flash('Product not specified', 'error')
+        return redirect(url_for('user.wishlist'))
+    
+    conn = get_db_connection()
+    c = conn.cursor()
+    
+    try:
+        c.execute(
+            'DELETE FROM wishlist WHERE user_email = %s AND product_id = %s',
+            (user_email, product_id)
+        )
+        conn.commit()
+        flash('Product removed from wishlist', 'success')
+    except Exception as e:
+        conn.rollback()
+        flash(f'Error removing product from wishlist: {str(e)}', 'error')
+    finally:
+        conn.close()
+        
+    return redirect(url_for('user.wishlist'))
+
+@user_bp.route('/delivery', methods=['GET', 'POST'])
 def delivery():
     add_security_headers()
     if 'user' not in session:
@@ -186,11 +339,66 @@ def delivery():
     email = session['user']
     conn = get_db_connection()
     c = conn.cursor()
+    
+    # Handle form submission
+    if request.method == 'POST':
+        address = request.form.get('address', '')
+        # For simplicity, we'll put the entire address in address_line1
+        # In a real app, you would parse the address into components
+        
+        # Check if the user already has an address
+        c.execute("SELECT * FROM user_addresses WHERE user_email = %s", (email,))
+        existing_address = c.fetchone()
+        
+        if existing_address:
+            # Update existing address
+            c.execute("""UPDATE user_addresses 
+                      SET address_line1 = %s, city = 'City', postal_code = '00000', country = 'Country'
+                      WHERE user_email = %s""", 
+                     (address, email))
+        else:
+            # Insert new address
+            c.execute("""INSERT INTO user_addresses 
+                      (user_email, address_line1, address_line2, city, state, postal_code, country) 
+                      VALUES (%s, %s, '', 'City', 'State', '00000', 'Country')""", 
+                     (email, address))
+        
+        conn.commit()
+        # Redirect to checkout after successful address submission
+        conn.close()
+        return redirect(url_for('user.checkout'))
+    
     # Fetch addresses for the user
     c.execute("SELECT * FROM user_addresses WHERE user_email = %s", (email,))
     addresses = c.fetchall()
+    
+    # Determine prefilled address
+    prefilled_address = ''
+    if addresses and len(addresses) > 0:
+        prefilled_address = addresses[0][1]  # Assuming address is the second column
+        # Determine prefilled address
+    prefilled_address = ''
+    if addresses and len(addresses) > 0:
+        # Compile address from components
+        address_parts = []
+        if addresses[0][2]:  # address_line1
+            address_parts.append(addresses[0][2])
+        if addresses[0][3]:  # address_line2
+            address_parts.append(addresses[0][3])
+        if addresses[0][4]:  # city
+            address_parts.append(addresses[0][4])
+        if addresses[0][5]:  # state
+            address_parts.append(addresses[0][5])
+        if addresses[0][6]:  # postal_code
+            address_parts.append(addresses[0][6])
+        if addresses[0][7]:  # country
+            address_parts.append(addresses[0][7])
+        
+        prefilled_address = ', '.join(filter(None, address_parts))
+    
     conn.close()
-    return render_template('delivery.html', user=session.get('user'), addresses=addresses)
+    return render_template('delivery.html', user=session.get('user'), 
+                          addresses=addresses, prefilled_address=prefilled_address)
 
 @user_bp.route('/checkout', methods=['GET', 'POST'])
 def checkout():
@@ -234,8 +442,23 @@ def checkout():
         conn.commit()
         conn.close()
         return jsonify({'message': 'Purchase successful', 'order_id': order_id})
+    
+    # Get user's addresses
+    c.execute('SELECT * FROM user_addresses WHERE user_email = %s', (email,))
+    addresses = c.fetchall()
+    
+    # Get user's payment methods
+    c.execute('SELECT * FROM user_payment_methods WHERE user_email = %s', (email,))
+    payment_methods = c.fetchall()
+    
     conn.close()
-    return render_template('checkout.html', cart_items=cart_items, total=total, user=email)
+    return render_template('checkout.html', 
+                          cart_items=cart_items, 
+                          total=total, 
+                          user=email,
+                          balance=balance,
+                          addresses=addresses,
+                          payment_methods=payment_methods)
 
 @user_bp.route('/wishlist', methods=['GET'])
 def wishlist():
@@ -252,7 +475,7 @@ def wishlist():
 @user_bp.route('/orders')
 def order_history():
     if 'user' not in session:
-        return redirect(url_for('login'))
+        return redirect(url_for('user.login'))
     user_email = session['user']
     conn = get_db_connection()
     c = conn.cursor()
@@ -337,6 +560,49 @@ def product_detail(product_id):
     conn.close()
     return render_template('product_detail.html', product=product, variants=variants, reviews=reviews, user=session.get('user'))
 
+@user_bp.route('/product/<int:product_id>/review', methods=['POST'])
+def add_product_review(product_id):
+    if 'user' not in session:
+        return jsonify({'error': 'Please log in to submit a review'}), 401
+    
+    user_email = session['user']
+    rating = request.form.get('rating')
+    comment = request.form.get('comment')
+    
+    if not rating or not comment:
+        return jsonify({'error': 'Rating and comment are required'}), 400
+    
+    try:
+        rating = int(rating)
+        if rating < 1 or rating > 5:
+            return jsonify({'error': 'Rating must be between 1 and 5'}), 400
+    except ValueError:
+        return jsonify({'error': 'Invalid rating value'}), 400
+    
+    conn = get_db_connection()
+    c = conn.cursor()
+    
+    try:
+        # Check if product exists
+        c.execute('SELECT * FROM products WHERE id = %s', (product_id,))
+        if not c.fetchone():
+            conn.close()
+            return jsonify({'error': 'Product not found'}), 404
+        
+        # Add review
+        c.execute(
+            'INSERT INTO product_reviews (product_id, user_email, rating, comment, created_at) VALUES (%s, %s, %s, %s, NOW())',
+            (product_id, user_email, rating, comment)
+        )
+        conn.commit()
+        conn.close()
+        return jsonify({'message': 'Review submitted successfully'})
+    
+    except Exception as e:
+        conn.rollback()
+        conn.close()
+        return jsonify({'error': str(e)}), 500
+
 @user_bp.route('/shop')
 def shop():
     conn = get_db_connection()
@@ -353,3 +619,28 @@ def about():
 @user_bp.route('/faq')
 def faq():
     return render_template('faq.html', user=session.get('user'))
+
+@user_bp.route('/account')
+def account():
+    if 'user' not in session:
+        return redirect(url_for('user.login'))
+    
+    user_email = session['user']
+    conn = get_db_connection()
+    c = conn.cursor()
+    
+    # Get user information
+    c.execute('SELECT * FROM users WHERE email = %s', (user_email,))
+    user_info = c.fetchone()
+    
+    # Get addresses
+    c.execute('SELECT * FROM user_addresses WHERE user_email = %s LIMIT 3', (user_email,))
+    addresses = c.fetchall()
+    
+    # Get payment methods
+    c.execute('SELECT * FROM user_payment_methods WHERE user_email = %s LIMIT 3', (user_email,))
+    payment_methods = c.fetchall()
+    
+    conn.close()
+    return render_template('account.html', user=user_email, user_info=user_info, 
+                           addresses=addresses, payment_methods=payment_methods)

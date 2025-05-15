@@ -37,7 +37,7 @@
                     <strong>Add New Payment Method</strong>
                 </div>
                 <div class="card-body">
-                    <form id="add-payment-form" action="/account/payment-methods" method="post">
+                    <form id="add-payment-form" action="{{ url_for('user.manage_payment_methods') }}" method="post">
                         <div class="mb-2">
                             <label for="payment_type" class="form-label">Type</label>
                             <select name="payment_type" id="payment_type" class="form-select" required>
@@ -69,6 +69,6 @@
             </div>
         </div>
     </div>
-    <a href="/account" class="btn btn-link mt-4">&larr; Back to Account</a>
+    <a href="{{ url_for('user.account') }}" class="btn btn-link mt-4">&larr; Back to Account</a>
 </div>
 {% endblock %}

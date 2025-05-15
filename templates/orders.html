@@ -21,7 +21,7 @@
           <td><span class="badge badge-info">{{ order[2] }}</span></td>
           <td>{{ order[14] }}</td>
           <td>${{ order[3]|round(2) }}</td>
-          <td><a href="/order/{{ order[0] }}" class="btn btn-outline-primary btn-sm">View</a></td>
+          <td><a href="{{ url_for('user.order_detail', order_id=order[0]) }}" class="btn btn-outline-primary btn-sm">View</a></td>
         </tr>
         {% endfor %}
       </tbody>

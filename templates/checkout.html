@@ -7,13 +7,54 @@
       <div class="row">
         <div class="col-md-6">
           <h5>Shipping Address</h5>
-          <input type="text" class="form-control mb-2" name="address" placeholder="Enter shipping address" required />
-          <!-- In a real app, list/select saved addresses here -->
+          <div class="form-group mb-3">
+            <select name="address_id" class="form-control mb-2" required>
+              <option value="">-- Select a saved address --</option>
+              {% for address in addresses %}
+                <option value="{{ address[0] }}">
+                  {{ address[2] }}{% if address[3] %}, {{ address[3] }}{% endif %},
+                  {{ address[4] }}, {{ address[5] }} {{ address[6] }}, {{ address[7] }}
+                </option>
+              {% endfor %}
+              <option value="new">Enter a new address...</option>
+            </select>
+          </div>
+          <div id="newAddressFields" style="display:none;">
+            <div class="form-group mb-2">
+              <input type="text" class="form-control" name="address_line1" placeholder="Address Line 1" />
+            </div>
+            <div class="form-group mb-2">
+              <input type="text" class="form-control" name="address_line2" placeholder="Address Line 2 (optional)" />
+            </div>
+            <div class="row mb-2">
+              <div class="col">
+                <input type="text" class="form-control" name="city" placeholder="City" />
+              </div>
+              <div class="col">
+                <input type="text" class="form-control" name="state" placeholder="State/Province" />
+              </div>
+            </div>
+            <div class="row mb-2">
+              <div class="col">
+                <input type="text" class="form-control" name="postal_code" placeholder="Postal Code" />
+              </div>
+              <div class="col">
+                <input type="text" class="form-control" name="country" placeholder="Country" />
+              </div>
+            </div>
+          </div>
         </div>
         <div class="col-md-6">
           <h5>Payment Method</h5>
-          <input type="text" class="form-control mb-2" name="payment" placeholder="Enter payment method (e.g. Visa)" required />
-          <!-- In a real app, list/select saved payment methods here -->
+          <div class="form-group mb-3">
+            <select name="payment_method_id" class="form-control mb-2" required>
+              <option value="">-- Select a payment method --</option>
+              {% for pm in payment_methods %}
+                <option value="{{ pm[0] }}">{{ pm[2] }} {{ pm[3] }} (ending in {{ pm[4][-4:] }})</option>
+              {% endfor %}
+              <option value="balance">Use account balance: ${{ balance|round(2) }}</option>
+            </select>
+          </div>
         </div>
       </div>
       <div class="row mt-4">
@@ -51,16 +92,50 @@
 {% endblock %}
 {% block scripts %}
   <script>
-    document.getElementById('checkoutForm').onsubmit = function(e) {
-      e.preventDefault();
-      // In a real app, collect all form data and send to backend
+    document.addEventListener('DOMContentLoaded', function() {
+      // Handle the address selection change
+      const addressSelect = document.querySelector('select[name="address_id"]');
+      const newAddressFields = document.getElementById('newAddressFields');
+      
+      if (addressSelect) {
+        addressSelect.addEventListener('change', function() {
+          if (this.value === 'new') {
+            newAddressFields.style.display = 'block';
+          } else {
+            newAddressFields.style.display = 'none';
+          }
+        });
+      }
+      
+      // Form submission handler
+      document.getElementById('checkoutForm').onsubmit = function(e) {
+        e.preventDefault();
+      
+      // Collect form data
+      const formData = new FormData(this);
+      const serializedData = new URLSearchParams(formData).toString();
+      
+      // Validate form
+      if (!this.checkValidity()) {
+        this.reportValidity();
+        return false;
+      }
+      
+      // Submit order
       fetch('{{ url_for("user.checkout") }}', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: '' // Add serialized form data if needed
+        body: serializedData
       }).then(r => r.json()).then(data => {
-        alert(data.message || data.error);
-        if (data.message) window.location = '{{ url_for("user.orders") }}';
+        if (data.error) {
+          alert(data.error);
+        } else {
+          alert(data.message || 'Order placed successfully!');
+          if (data.order_id) window.location = '{{ url_for("user.orders") }}';
+        }
+      }).catch(err => {
+        console.error(err);
+        alert('An error occurred while processing your order. Please try again.');
       });
     };
   </script>

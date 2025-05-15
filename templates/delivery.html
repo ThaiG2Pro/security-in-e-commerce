@@ -3,8 +3,9 @@
 {% block content %}
   <div class="container mx-auto px-4 py-6 max-w-3xl">
     <h1 class="text-3xl font-bold mb-6 text-gray-800">Delivery Address</h1>
-    <form method="POST" class="flex flex-col gap-4">
-      <label for="address" class="text-lg font-semibold text-gray-700">Address:</label>
+    <form method="POST" action="{{ url_for('user.delivery') }}" class="flex flex-col gap-4">
+      <label for="address" class="text-lg font-semibold text-gray-700">Delivery Address:</label>
+      <p class="text-sm text-gray-600 mb-2">Please enter your complete address where you want your order to be delivered.</p>
       <textarea id="address" name="address" rows="4" class="w-full max-w-md p-3 border border-gray-300 rounded-lg text-gray-700 resize-vertical focus:outline-none focus:ring-2 focus:ring-orange-500">{{ prefilled_address }}</textarea>
       <button type="submit" class="w-fit bg-orange-500 text-white font-bold py-3 px-6 rounded-lg shadow-lg hover:bg-orange-600 transition-colors">Submit Address</button>
     </form>

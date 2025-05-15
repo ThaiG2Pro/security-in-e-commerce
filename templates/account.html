@@ -7,16 +7,16 @@
         <div class="col-md-4">
             <div class="card mb-4">
                 <div class="card-body text-center">
-                    <img src="/static/images/user_avatar.png" alt="Avatar" class="rounded-circle mb-3" width="80" height="80">
+                    <img src="{{ url_for('static', filename='images/user_avatar.png') }}" alt="Avatar" class="rounded-circle mb-3" width="80" height="80">
                     <h5 class="card-title">{{ user.first_name }} {{ user.last_name }}</h5>
                     <p class="card-text text-muted">{{ user.email }}</p>
                 </div>
             </div>
             <div class="list-group">
-                <a href="/orders" class="list-group-item list-group-item-action">Order History</a>
-                <a href="/account/addresses" class="list-group-item list-group-item-action">Manage Addresses</a>
-                <a href="/account/payment-methods" class="list-group-item list-group-item-action">Payment Methods</a>
-                <a href="/logout" class="list-group-item list-group-item-action text-danger">Logout</a>
+                <a href="{{ url_for('user.orders') }}" class="list-group-item list-group-item-action">Order History</a>
+                <a href="{{ url_for('user.manage_addresses') }}" class="list-group-item list-group-item-action">Manage Addresses</a>
+                <a href="{{ url_for('user.manage_payment_methods') }}" class="list-group-item list-group-item-action">Payment Methods</a>
+                <a href="{{ url_for('user.logout') }}" class="list-group-item list-group-item-action text-danger">Logout</a>
             </div>
         </div>
         <div class="col-md-8">
@@ -37,7 +37,7 @@
                     <div class="card h-100">
                         <div class="card-body text-center">
                             <h6>Recent Orders</h6>
-                            <a href="/orders" class="btn btn-outline-primary btn-sm mt-2">View Orders</a>
+                            <a href="{{ url_for('user.orders') }}" class="btn btn-outline-primary btn-sm mt-2">View Orders</a>
                         </div>
                     </div>
                 </div>
@@ -45,7 +45,7 @@
                     <div class="card h-100">
                         <div class="card-body text-center">
                             <h6>Saved Addresses</h6>
-                            <a href="/account/addresses" class="btn btn-outline-primary btn-sm mt-2">Manage Addresses</a>
+                            <a href="{{ url_for('user.manage_addresses') }}" class="btn btn-outline-primary btn-sm mt-2">Manage Addresses</a>
                         </div>
                     </div>
                 </div>
@@ -53,7 +53,7 @@
                     <div class="card h-100">
                         <div class="card-body text-center">
                             <h6>Payment Methods</h6>
-                            <a href="/account/payment-methods" class="btn btn-outline-primary btn-sm mt-2">Manage Payments</a>
+                            <a href="{{ url_for('user.manage_payment_methods') }}" class="btn btn-outline-primary btn-sm mt-2">Manage Payments</a>
                         </div>
                     </div>
                 </div>
@@ -61,7 +61,7 @@
                     <div class="card h-100">
                         <div class="card-body text-center">
                             <h6>Wishlist</h6>
-                            <a href="/wishlist" class="btn btn-outline-primary btn-sm mt-2">View Wishlist</a>
+                            <a href="{{ url_for('user.wishlist') }}" class="btn btn-outline-primary btn-sm mt-2">View Wishlist</a>
                         </div>
                     </div>
                 </div>

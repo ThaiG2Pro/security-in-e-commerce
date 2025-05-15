@@ -4,7 +4,7 @@
   <div class="container bg-white rounded shadow p-4 mt-4">
     <div class="row">
       <div class="col-md-6">
-        <img src="/static/images/{{ product[7] }}" class="img-fluid rounded mb-3" alt="{{ product[1] }}" />
+        <img src="{{ url_for('static', filename='images/' + product[7]) }}" class="img-fluid rounded mb-3" alt="{{ product[1] }}" />
       </div>
       <div class="col-md-6">
         <h2 class="font-bold text-2xl mb-2">{{ product[1] }}</h2>
@@ -80,7 +80,7 @@
     document.getElementById('addToCartForm').onsubmit = function(e) {
       e.preventDefault();
       const data = new URLSearchParams(new FormData(this));
-      fetch('/add_to_cart', {
+      fetch("{{ url_for('user.add_to_cart') }}", {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: 'product_id={{ product[0] }}&' + data.toString()
@@ -89,7 +89,7 @@
       });
     };
     function addToWishlist(productId) {
-      fetch('/add_to_wishlist', {
+      fetch("{{ url_for('user.add_to_wishlist') }}", {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: 'product_id=' + productId
@@ -100,7 +100,7 @@
     document.getElementById('reviewForm').onsubmit = function(e) {
       e.preventDefault();
       const data = new URLSearchParams(new FormData(this));
-      fetch('/product/{{ product[0] }}/review', {
+      fetch("{{ url_for('user.add_product_review', product_id=product[0]) }}", {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: data.toString()

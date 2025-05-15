@@ -38,7 +38,7 @@
                     <strong>Add New Address</strong>
                 </div>
                 <div class="card-body">
-                    <form id="add-address-form" action="/account/addresses" method="post">
+                    <form id="add-address-form" action="{{ url_for('user.manage_addresses') }}" method="post">
                         <div class="mb-2">
                             <label for="address_type" class="form-label">Type</label>
                             <select name="address_type" id="address_type" class="form-select" required>
@@ -80,6 +80,6 @@
             </div>
         </div>
     </div>
-    <a href="/account" class="btn btn-link mt-4">&larr; Back to Account</a>
+    <a href="{{ url_for('user.account') }}" class="btn btn-link mt-4">&larr; Back to Account</a>
 </div>
 {% endblock %}
