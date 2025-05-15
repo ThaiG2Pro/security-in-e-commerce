@@ -81,6 +81,11 @@
       input.addEventListener('change', function() {
         updateSubtotal(this);
       });
+      
+      // Also listen for input events to update in real-time as the user types
+      input.addEventListener('input', function() {
+        updateLocalSubtotal(this);
+      });
     });
     
     // Update cart button
@@ -90,8 +95,6 @@
     
     // Calculate and update subtotal for a product
     function updateSubtotal(inputElement) {
-      const productId = inputElement.dataset.productId;
-      const variant = inputElement.dataset.variant;
       const quantity = parseInt(inputElement.value);
       
       if (quantity < 0) {
@@ -99,7 +102,10 @@
         return;
       }
       
-      // Form data to send to server
+      // First, update the UI immediately for a responsive feel
+      updateLocalSubtotal(inputElement);
+      
+      // Then send the data to the server (but don't wait for response to update UI)
       const formData = new FormData(cartForm);
       
       // Send AJAX request to update cart
@@ -110,9 +116,12 @@
       .then(response => response.json())
       .then(data => {
         if (data.success) {
+          // Server has validated the update, can use its values if needed
           updateCartDisplay(data);
         } else {
           alert(data.error || 'An error occurred');
+          // Revert to original value if there was an error
+          window.location.reload();
         }
       })
       .catch(error => {
@@ -121,6 +130,11 @@
     }
     
     function updateCartForm() {
+      // First, update all subtotals and total locally
+      quantityInputs.forEach(input => {
+        updateLocalSubtotal(input);
+      });
+      
       const formData = new FormData(cartForm);
       
       fetch("{{ url_for('user.update_cart') }}", {
@@ -158,6 +172,36 @@
       if (data.items.length < quantityInputs.length) {
         window.location.reload();
       }
+    }
+    
+    // Function to update the subtotal locally without waiting for server response
+    function updateLocalSubtotal(inputElement) {
+      const row = inputElement.closest('tr');
+      const priceText = row.querySelector('td:nth-child(3)').textContent.trim();
+      const price = parseFloat(priceText.replace('$', ''));
+      const quantity = parseInt(inputElement.value) || 0;
+      
+      // Update the subtotal for this product
+      const subtotalCell = row.querySelector('.subtotal');
+      const newSubtotal = price * quantity;
+      subtotalCell.textContent = '$' + newSubtotal.toFixed(2);
+      
+      // Update the total
+      updateLocalTotal();
+    }
+    
+    // Function to update the total by summing all visible subtotals
+    function updateLocalTotal() {
+      const subtotalElements = document.querySelectorAll('.subtotal');
+      let total = 0;
+      
+      subtotalElements.forEach(element => {
+        const subtotalText = element.textContent.trim();
+        const subtotal = parseFloat(subtotalText.replace('$', '')) || 0;
+        total += subtotal;
+      });
+      
+      document.getElementById('cart-total').textContent = '$' + total.toFixed(2);
     }
   });
 </script>

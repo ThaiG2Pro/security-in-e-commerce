@@ -7,22 +7,25 @@
     <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
       {% for product in products %}
       <div class="bg-white rounded-lg shadow overflow-hidden">
-        <img src="{{ url_for('static', filename='images/' + product[7]) }}" alt="{{ product[1] }}" class="w-full h-48 object-cover">
-        <div class="p-4">
+        <img src="{{ product.image_url }}" alt="{{ product[1] }}" class="w-full h-48 object-cover">
+        <img src="{{ url_for('static', filename='images/' + product['image']) }}" alt="{{ product['name'] }}" class="w-full h-48 object-cover">
           <h3 class="font-bold mb-2">{{ product[1] }}</h3>
-          <p class="text-gray-600 text-sm mb-3">{{ product[2] }}</p>
+          <p class="text-gray-600 text-sm mb-3">{{ product.description }}</p>
           <div class="flex justify-between items-center">
             {% if product[4] and product[4] < product[3] %}
-            <span class="text-red-600 font-bold">${{ product[4]|round(2) }}</span>
-            <span class="text-gray-400 line-through">${{ product[3]|round(2) }}</span>
+          <h3 class="font-bold mb-2">{{ product['name'] }}</h3>
+          <p class="text-gray-600 text-sm mb-3">{{ product['description'] }}</p>
+          {% if product['discount_price'] and product['discount_price'] < product['original_price'] %}
+          <span class="bg-red-100 text-red-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded">Discount</span>
+          {% endif %}
             {% else %}
-            <span class="text-gray-800 font-bold">${{ product[3]|round(2) }}</span>
+            {% if product['discount_price'] and product['discount_price'] < product['original_price'] %}
+            <span class="text-red-600 font-bold">${{ product['discount_price']|format("%.2f") }}</span>
+            <span class="text-gray-400 line-through">${{ product['original_price']|format("%.2f") }}</span>
+            {% else %}
+            <span class="text-gray-800 font-bold">${{ product['original_price']|format("%.2f") }}</span>
             {% endif %}
-            <a href="{{ url_for('user.product_detail', product_id=product[0]) }}" class="text-amber-600 hover:text-amber-800">View <i class="fas fa-arrow-right ml-1"></i></a>
-          </div>
-        </div>
-      </div>
-      {% endfor %}
+            <a href="{{ url_for('user.product_detail', product_id=product['id']) }}" class="text-amber-600 hover:text-amber-800">View <i class="fas fa-arrow-right ml-1"></i></a>
     </div>
   </div>
 </section>
