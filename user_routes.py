@@ -90,8 +90,9 @@ def reset_password():
             c.execute('INSERT INTO reset_tokens (email, token) VALUES (%s, %s)',
                       (email, token))
             conn.commit()
-            host = request.headers.get('Host')
-            reset_link = f'http://{host}/reset/{token}'
+            # Hard-coded domain for security - prevents Host header attacks
+            base_url = "http://localhost:5000" 
+            reset_link = f"{base_url}/reset/{token}"
             print(f'Reset password link for {email}: {reset_link}')
             conn.close()
             return jsonify({'message': 'Reset link sent. Check console.'})
