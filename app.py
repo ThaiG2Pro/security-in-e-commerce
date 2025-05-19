@@ -1,8 +1,12 @@
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify
 import os
+from dotenv import load_dotenv
 from models import is_db_empty, init_db, populate_sample_data
 from admin_routes import admin_bp
 from user_routes import user_bp
+
+# Load environment variables from .env file
+load_dotenv()
 
 app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY', 'your-secret-key')

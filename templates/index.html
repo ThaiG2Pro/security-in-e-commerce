@@ -3,7 +3,7 @@
 {% block head %}
 <style>
   .hero-section {
-    background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url("{% raw %}{{ url_for('static', filename='images/hero-coffee.jpg') }}{% endraw %}");
+    background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url("{{ url_for('static', filename='images/hero-coffee.jpg') }}");
     background-size: cover;
     background-position: center;
     color: white;

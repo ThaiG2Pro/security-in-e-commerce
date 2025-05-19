@@ -2,6 +2,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session, jsonify, flash
 import hashlib
 import uuid
+import os
 import psycopg2
 from models import get_db_connection, is_db_empty
 from utils import add_security_headers
@@ -607,8 +608,27 @@ def add_product_review(product_id):
 def shop():
     conn = get_db_connection()
     c = conn.cursor()
+    # Get column names from products table
+    c.execute("SELECT column_name FROM information_schema.columns WHERE table_name='products' ORDER BY ordinal_position")
+    column_names = [row[0] for row in c.fetchall()]
+    
+    # Fetch products
     c.execute('SELECT * FROM products ORDER BY id DESC')
-    products = c.fetchall()
+    products_data = c.fetchall()
+    
+    # Format product data with column names for easier access in template
+    products = []
+    
+    for product in products_data:
+        # Map tuple values to dictionary keys
+        product_dict = {column_names[i]: product[i] for i in range(min(len(column_names), len(product)))}
+        # Ensure image path is set correctly
+        if product_dict.get('image'):
+            # Make sure image doesn't have a path prefix already
+            image_name = os.path.basename(product_dict['image'])
+            product_dict['image'] = image_name
+        products.append(product_dict)
+    
     conn.close()
     return render_template('shop.html', products=products, user=session.get('user'))
 

@@ -2,6 +2,9 @@
 from flask import session, redirect, url_for, after_this_request
 import os
 from functools import wraps
+from dotenv import load_dotenv
+
+load_dotenv()
 
 def add_security_headers():
     if os.getenv('SECURITY_HEADERS', 'false').lower() == 'true':
