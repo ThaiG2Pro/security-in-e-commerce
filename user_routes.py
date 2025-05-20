@@ -469,7 +469,14 @@ def wishlist():
     user_email = session['user']
     conn = get_db_connection()
     c = conn.cursor()
-    c.execute('SELECT * FROM wishlists WHERE user_email = %s', (user_email,))
+    # Join wishlists with products to get all required product information
+    c.execute('''
+        SELECT p.id, p.name, p.price, p.description, w.added_at, w.id, p.image 
+        FROM wishlists w 
+        JOIN products p ON w.product_id = p.id 
+        WHERE w.user_email = %s
+        ORDER BY w.added_at DESC
+    ''', (user_email,))
     wishlist_items = c.fetchall()
     conn.close()
     return render_template('wishlist.html', wishlist_items=wishlist_items, user=user_email)
@@ -495,7 +502,15 @@ def order_detail(order_id):
     c = conn.cursor()
     c.execute('SELECT * FROM orders WHERE id = %s AND user_email = %s', (order_id, user_email))
     order = c.fetchone()
-    c.execute('SELECT * FROM order_items WHERE order_id = %s', (order_id,))
+    
+    # Join order_items with products to get product details like name and image
+    c.execute('''
+        SELECT oi.*, p.name, p.image, pv.variant_type, pv.variant_value
+        FROM order_items oi
+        LEFT JOIN products p ON oi.product_id = p.id
+        LEFT JOIN product_variants pv ON oi.product_variant_id = pv.id
+        WHERE oi.order_id = %s
+    ''', (order_id,))
     items = c.fetchall()
     conn.close()
     return render_template('order_detail.html', order=order, items=items, user=user_email)
