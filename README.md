@@ -1,107 +1,90 @@
-E-Commerce Website
-This is a simple e-commerce website built with Flask, SQLite, and Tailwind CSS. It includes features like product listing, cart, checkout, user registration, login, email verification, and password reset. The project intentionally includes two security vulnerabilities (clickjacking and host header injection) for demonstration purposes.
-Table of Contents
+<!-- filepath: /home/thai/Projects/5-2025/EC335/README.md -->
+# E-Commerce Website
 
-Features
-Project Structure
-Requirements
-Setup Instructions
-Running Locally
-Deploying Online
-Security Vulnerabilities
-Troubleshooting
-Contributing
+A simple e-commerce website built with Flask, SQLite, and Tailwind CSS for educational purposes.
 
-Features
+## Overview
 
-Product Listing: Automatically displays products based on .jpg images in static/images (200x200px).
-Cart: Add products to cart and view cart contents.
-Checkout: Confirm purchase with a dedicated checkout page (vulnerable to clickjacking).
-User Authentication:
-Register with email and password.
-Verify email via a link (logged to console).
-Login with session management.
-Reset password via a link (vulnerable to host header injection).
+This project demonstrates a basic e-commerce platform with product listings, shopping cart, checkout process, and user authentication. It intentionally includes two security vulnerabilities (clickjacking and host header injection) for educational demonstration.
 
-Responsive Design: Built with Tailwind CSS for a clean, mobile-friendly interface.
-Fake Email System: Verification and reset links are logged to the console instead of sent via email.
+## Features
 
-Setup Instructions
+- **Product Listings:** Display products from images in static/images folder
+- **Shopping Cart:** Add and manage items in your cart
+- **User System:** Register, login, email verification, password reset
+- **Responsive Design:** Mobile-friendly interface using Tailwind CSS
+- **Demo Email System:** Links are logged to console instead of sent via email
 
-Clone the Repository (if using Git):
-git clone https://github.com/ThaiG2Pro/security-in-e-commerce.git
-cd EC335
+## Quick Start
 
-Or create the project structure manually as shown above.
+### Prerequisites
+- Python 3.x
+- pip
 
-Create a Virtual Environment:
-python3 -m venv venv
-source venv/bin/activate # Linux/Mac
-venv\Scripts\activate # Windows
+### Setup
 
-Install Dependencies:
-pip install -r requirements.txt
+1. **Clone the repository:**
+   ```
+   git clone https://github.com/ThaiG2Pro/security-in-e-commerce.git
+   cd EC335
+   ```
 
-Update Secret Key:
+2. **Create virtual environment:**
+   ```
+   python3 -m venv venv
+   source venv/bin/activate  # Linux/Mac
+   # OR
+   venv\Scripts\activate  # Windows
+   ```
 
-Open app.py and replace app.secret_key = 'your-secret-key' with a random string (e.g., x7k9m2p8q5).
+3. **Install dependencies:**
+   ```
+   pip install -r requirements.txt
+   ```
 
-Running Locally
+4. **Update the secret key:**
+   - Open `app.py`
+   - Replace `app.secret_key = 'your-secret-key'` with a random string
 
-Activate Virtual Environment:
-source venv/bin/activate # Linux/Mac
-venv\Scripts\activate # Windows
+### Running the Application
 
-Run the Application:
-python app.py
+1. **Start the server:**
+   ```
+   python app.py
+   ```
 
-Access the Website:
+2. **Access the website:**
+   - Open your browser and go to http://localhost:5000
+   - Browse products and add them to cart
+   - Register at /register (check console for verification link)
+   - Login at /login once verified
+   - Test password reset at /reset-password
 
-Open a browser and go to http://localhost:5000.
-Test features:
-Browse products and add to cart.
-Register (/register), check console for verification link, and verify email.
-Login (/login) with verified account.
-Reset password (/reset-password), check console for reset link.
-Proceed to checkout (/checkout) after adding items to cart.
+## Security Vulnerabilities (For Educational Purposes)
 
-Deploying Online
-To deploy on Render.com:
+1. **Clickjacking:**    
+   - The /checkout page can be embedded in an iframe
+   - Test with: `<iframe src="http://<your-url>/checkout" width="100%" height="600px"></iframe>`
 
-Clickjacking:
-The /checkout page lacks the X-Frame-Options header, allowing it to be embedded in an iframe.
-Test by creating an HTML file with:<iframe src="http://<your-url>/checkout" width="100%" height="600px"></iframe>
+2. **Host Header Injection:**
+   - The password reset and registration systems are vulnerable
+   - Can be tested by modifying the Host header to a malicious domain
 
-Host Header Injection:
-The /reset-password and /register routes use request.headers.get('Host') without validation, making reset/verification links vulnerable.
-Test by modifying the Host header (e.g., using Burp Suite) to evil.com and checking the console for a link like http://evil.com/reset/<token>.
+> **Warning:** Do not use this code in production without fixing these vulnerabilities!
 
-Warning: Do not use this code in production without fixing these vulnerabilities.
-Troubleshooting
+## Troubleshooting
 
-"User not verified" error:
-Check the console for the verification link and access it.
-Alternatively, reset the password (/reset-password), as it automatically verifies the account.
+- **User not verified:** Check console for verification link or reset password
+- **Email exists error:** Delete the user from database or reset password:
+  ```
+  sqlite3 database.db
+  DELETE FROM users WHERE email = '<email>';
+  DELETE FROM verification WHERE email = '<email>';
+  DELETE FROM reset_tokens WHERE email = '<email>';
+  ```
+- **404 Not Found for links:** Ensure server is running and database entries match
+- **No products:** Add .jpg images (200x200px) to static/images folder
 
-"Email already exists" error:
-Delete the email from database.db:sqlite3 database.db
-DELETE FROM users WHERE email = '<email>';
-DELETE FROM verification WHERE email = '<email>';
-DELETE FROM reset_tokens WHERE email = '<email>';
+## Contributing
 
-Or reset the password for the existing email.
-
-"404 Not Found" for verification/reset links:
-Ensure the server is running (python app.py).
-Verify the link’s email and token match the database.
-Create a new token if needed:sqlite3 database.db
-INSERT INTO verification (email, token) VALUES ('<email>', 'new-token-123456');
-
-Then access: http://localhost:5000/verify?email=<email>&token=new-token-123456.
-
-Missing images:
-Ensure static/images contains .jpg files (200x200px).
-Delete database.db and rerun python app.py to regenerate products.
-
-Contributing
-Feel free to fork this repository, make improvements, and submit pull requests. For security fixes, please test thoroughly to maintain the intended vulnerabilities for demonstration purposes.
+Feel free to fork this repository and submit improvements. For security fixes, please test thoroughly to maintain the intended vulnerabilities for demonstration purposes.
