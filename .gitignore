@@ -52,4 +52,7 @@ config.json
 
 image_of_internet/
 
+*.zip
+render.yaml
 
+*.md 
