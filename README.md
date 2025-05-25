@@ -81,17 +81,48 @@ Warning: Do not use this code in production without fixing these vulnerabilities
 
 ## Database Migration (Alembic)
 
-This project now uses [Alembic](https://alembic.sqlalchemy.org/) for database migrations.
+### Creating a New Migration
+To create a new migration (for schema changes):
+```sh
+alembic revision -m "description_of_changes"
+```
 
-- For **local development**, the database schema is initialized automatically if `FLASK_ENV=development`.
-- For **production deployments** (e.g., Render), you must run Alembic migrations:
+This will create a new file in `alembic/versions/`. Edit this file to include your database changes.
 
+### Running Migrations
+Run migrations to update your database schema:
+```sh
+./run_migrations.sh
+```
+Or manually:
 ```sh
 alembic upgrade head
 ```
 
-This will apply all schema changes safely without dropping data.
+### Deploying on Render
+- Ensure your Render build or start command includes:
+  ```sh
+  alembic upgrade head
+  ```
+- Do **not** use `init_db()` in production.
 
+### Common Migration Issues
+- **Missing revision IDs**: Make sure all migration files have proper revision identifiers.
+- **Migration order**: Migrations run in the order specified by their revision chain.
+- **Database URL**: Ensure the DATABASE_URL environment variable is set correctly.
+- **Manual fixes**: For emergency fixes, you can edit the database directly using:
+  ```sh
+  psql $DATABASE_URL
+  ```
+
+### Testing Migrations Locally
+Before deploying, test your migrations:
+```sh
+# Set a temporary database URL for testing
+export DATABASE_URL="postgresql://localhost/testdb"
+# Run migrations
+alembic upgrade head
+```
 ### Initial Setup
 1. Install dependencies:
    ```sh
@@ -102,13 +133,6 @@ This will apply all schema changes safely without dropping data.
    ```sh
    alembic upgrade head
    ```
-
-### Deploying on Render
-- Ensure your Render build or start command includes:
-  ```sh
-  alembic upgrade head
-  ```
-- Do **not** use `init_db()` in production.
 
 Troubleshooting
 

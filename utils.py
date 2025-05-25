@@ -1,10 +1,31 @@
 # utils.py
 from flask import session, redirect, url_for, after_this_request
 import os
+import psycopg2
+import sys
 from functools import wraps
-from dotenv import load_dotenv
+# Use config instead of direct dotenv loading
+import config
 
-load_dotenv()
+def get_db_connection():
+    """Get a database connection with error handling.
+    
+    Returns:
+        Connection: A database connection object
+    """
+    try:
+        conn = psycopg2.connect(os.environ.get('DATABASE_URL'))
+        return conn
+    except psycopg2.OperationalError as e:
+        print(f"Database connection error: {e}", file=sys.stderr)
+        # For development, provide a fallback to SQLite
+        if config.ENV == 'development':
+            import sqlite3
+            print("Falling back to SQLite for development", file=sys.stderr)
+            return sqlite3.connect('database.db')
+        else:
+            # In production, re-raise the error
+            raise
 
 def add_security_headers():
     if os.getenv('SECURITY_HEADERS', 'false').lower() == 'true':

@@ -1,5 +1,6 @@
-Pillow
+Pillow==11.2.1
 Flask==2.3.2
 gunicorn==20.1.0
 psycopg2-binary==2.9.6
-alembic
+alembic==1.16.1
+SQLAlchemy==2.0.41

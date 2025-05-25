@@ -167,7 +167,9 @@ def init_db():
     c.execute('''CREATE TABLE IF NOT EXISTS verification (
         email TEXT PRIMARY KEY, token TEXT)''')
     c.execute('''CREATE TABLE IF NOT EXISTS reset_tokens (
-        email TEXT PRIMARY KEY, token TEXT)''')
+        email TEXT PRIMARY KEY, 
+        token TEXT,
+        expires_at TIMESTAMP)''')
     conn.commit()
     conn.close()
 

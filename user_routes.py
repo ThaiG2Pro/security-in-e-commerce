@@ -87,12 +87,15 @@ def reset_password():
         c.execute('SELECT email FROM users WHERE email = %s', (email,))
         if c.fetchone():
             token = str(uuid.uuid4())
-            c.execute('INSERT INTO reset_tokens (email, token) VALUES (%s, %s)',
+            # Delete any existing tokens
+            c.execute('DELETE FROM reset_tokens WHERE email = %s', (email,))
+            # Insert new token with expiration (24 hours from now)
+            c.execute('INSERT INTO reset_tokens (email, token, expires_at) VALUES (%s, %s, CURRENT_TIMESTAMP + INTERVAL \'24 hours\')',
                       (email, token))
             conn.commit()
-            # Hard-coded domain for security - prevents Host header attacks
-            base_url = "http://localhost:5000" 
-            reset_link = f"{base_url}/reset/{token}"
+            # Use configured website URL
+            from config import WEBSITE_URL
+            reset_link = f"{WEBSITE_URL}/reset/{token}"
             print(f'Reset password link for {email}: {reset_link}')
             conn.close()
             return jsonify({'message': 'Reset link sent. Check console.'})
@@ -108,7 +111,7 @@ def reset_confirm(token):
         hashed_password = hashlib.sha256(password.encode()).hexdigest()
         conn = get_db_connection()
         c = conn.cursor()
-        c.execute('SELECT email FROM reset_tokens WHERE token = %s', (token,))
+        c.execute('SELECT email FROM reset_tokens WHERE token = %s AND expires_at > CURRENT_TIMESTAMP', (token,))
         result = c.fetchone()
         if result:
             email = result[0]
@@ -119,7 +122,18 @@ def reset_confirm(token):
             conn.close()
             return jsonify({'message': 'Password reset successful'})
         conn.close()
-        return jsonify({'error': 'Invalid token'}), 400
+        return jsonify({'error': 'Invalid or expired token'}), 400
+    
+    # Check if token exists and is not expired for GET requests
+    if request.method == 'GET':
+        conn = get_db_connection()
+        c = conn.cursor()
+        c.execute('SELECT email FROM reset_tokens WHERE token = %s AND expires_at > CURRENT_TIMESTAMP', (token,))
+        result = c.fetchone()
+        conn.close()
+        if not result:
+            return render_template('reset.html', error="Invalid or expired token. Please request a new reset link.")
+    
     return render_template('reset_confirm.html', token=token)
 
 @user_bp.route('/verify')
