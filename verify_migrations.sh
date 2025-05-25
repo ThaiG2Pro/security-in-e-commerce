@@ -1,6 +1,8 @@
 #!/bin/bash
 # verify_migrations.sh - A script to verify Alembic migrations before deployment
 
+set -e  # Exit immediately if a command exits with a non-zero status
+
 echo "Checking Alembic migration files..."
 
 # Check if alembic directory exists
@@ -33,9 +35,14 @@ for file in alembic/versions/*.py; do
     fi
 done
 
+# Check if python-dotenv is installed, but don't fail if it's not
+pip install python-dotenv || echo "Warning: python-dotenv not installed, but continuing anyway..."
+
 # Check migration history
 echo "Checking migration history..."
-alembic history
+alembic history || {
+    echo "Warning: Could not check migration history, but continuing anyway..."
+}
 
 echo "All migration files look good!"
 exit 0

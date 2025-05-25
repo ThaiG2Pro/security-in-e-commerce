@@ -2,10 +2,12 @@ services:
   - type: web
     name: flask-app
     runtime: python
-    buildCommand: pip install -r requirements.txt && ./verify_migrations.sh && alembic upgrade head
+    buildCommand: pip install -r requirements.txt && ./check_dependencies.sh && ./verify_migrations.sh && alembic upgrade head
     startCommand: gunicorn app:app
     envVars:
       - key: FLASK_ENV
         value: production
       - key: SECURITY_HEADERS
+        value: "true"
+      - key: PYTHONUNBUFFERED
         value: "true"

@@ -3,10 +3,14 @@
 import os
 import psycopg2
 from urllib.parse import urlparse
-from dotenv import load_dotenv
 
-# Load environment variables from .env file
-load_dotenv()
+# Try to load environment variables from .env file, but continue if not available
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    # In production, we can rely on environment variables being set
+    pass
 
 def get_db_connection():
     db_url = os.getenv('DATABASE_URL')

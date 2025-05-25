@@ -1,9 +1,13 @@
 """Configuration settings for the application."""
 import os
-from dotenv import load_dotenv
 
-# Load environment variables from .env file
-load_dotenv()
+# Try to load environment variables from .env file, but continue if not available
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+    print("Environment variables loaded from .env file")
+except ImportError:
+    print("python-dotenv not installed, using environment variables as is")
 
 # Get environment
 ENV = os.getenv('FLASK_ENV', 'development')
